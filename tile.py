@@ -1,7 +1,7 @@
 import pygame
-from settings import groundColor, checkpointColor
+from settings import groundColor, checkpointColor, endColor
 
-tileColors = (groundColor, checkpointColor)
+tileColors = (groundColor, checkpointColor, endColor)
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, x, y, size, type):

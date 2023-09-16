@@ -5,13 +5,15 @@ from camera import Camera
 from settings import * 
 import pygame
 
+tileTypes = {"X" : 0, "C" : 1, "E" : 2}
+
 class Level:
 
     def __init__(self, layout, screen):
         self.screen = screen
         self.layout = layout
         self.player = pygame.sprite.GroupSingle()
-        self.reset = False
+        self.reset = 0
 
 
 
@@ -21,23 +23,20 @@ class Level:
             for colIndex, col in enumerate(row):
                 x = colIndex * tileSize#Tilesize multiplication is so that the grid system works fine
                 y = rowIndex * tileSize
-                if col == "X":
-                    tile = Tile(x, y, tileSize, 0)
-                    self.tiles.add(tile)
-                elif col == "C":
-                    tile = Tile(x, y, tileSize, 1)
-                    self.tiles.add(tile)
-                elif col == "P":
-                    playerSprite = Player(x, y)
+                if col == "P":
+                    playerSprite = Player(x + tileSize/2 - pWidth/2, y)
                     self.player.add(playerSprite)
                     self.camera = Camera(x, y, self.player)
+                elif col != " ":
+                    tile = Tile(x, y, tileSize, tileTypes.get(col))
+                    self.tiles.add(tile)
     def resetLevel(self):
         player = self.player.sprite
         if player.checkpoint != None:
             player.rect.x = player.checkpoint[0]
             player.rect.y = player.checkpoint[1]
         else:
-            self.reset = True
+            self.reset = 1
                 
     def tick(self):
         self.player.update()
@@ -87,13 +86,17 @@ class Level:
                 else:
                     self.generalCollision(tile)
         if player.onGround == True and onGround == False:
-            player.jumpFrames = 4
+            player.jumpFrames = 3
         player.onGround = onGround
         if self.player.sprite.rect.y > deathHeight:
             self.resetLevel()
 
     def generalCollision(self, tile):
         if tile.type == 1:
-            self.player.sprite.checkpoint = (tile.rect.x, tile.rect.y)
+            self.player.sprite.checkpoint = (tile.rect.x + tile.rect.width / 2 - self.player.sprite.rect.width / 2, tile.rect.y)
+        elif tile.type == 2:
+            self.reset = 2
+
+
 
         

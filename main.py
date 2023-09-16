@@ -9,8 +9,10 @@ pygame.init()
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 clock = pygame.time.Clock()
 
+levelCount = 0
+
 pygame.display.set_caption("Platformer Game")
-level = Level(layout, screen)
+level = Level(levels[0], screen)
 level.loadLevel()
 
 # Main game loop
@@ -21,11 +23,14 @@ while True:
             sys.exit()
     
     screen.fill(white)
-    if level.reset == False:
+    if level.reset == 0:#Wont reset
         level.tick()
     else:
-        level = Level(layout, screen)
+        if level.reset == 2:#End of level else is just death without checkpoint
+            levelCount += 1
+        level = Level(levels[levelCount], screen)
         level.loadLevel()
+
     pygame.display.flip()### NOTE: Use this for double buffering later on. ###
 
 
