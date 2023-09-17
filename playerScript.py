@@ -1,11 +1,6 @@
 import pygame
 from vector import Vector2
-from settings import pHeight, pWidth, playerColor
-
-
-screen_width = 1200
-screen_height = 800
-
+from settings import pHeight, pWidth, playerColor, tileSize
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -16,14 +11,14 @@ class Player(pygame.sprite.Sprite):
 
         self.velocity = Vector2(0, 0)
         self.onGround = False
-        self.jump_strength = 25
-        self.speed = 15
-        self.gravity = 2
+        self.jumpStrength = tileSize*0.2#25
+        self.speed = tileSize*0.12#15
+        self.gravity = self.jumpStrength*0.08#2
         self.jumpFrames = 0
         self.checkpoint = None
     def jump(self):
         if self.onGround or self.jumpFrames > 0:
-            self.velocity.y = self.jump_strength
+            self.velocity.y = self.jumpStrength
 
     def getInput(self):
         keys = pygame.key.get_pressed()

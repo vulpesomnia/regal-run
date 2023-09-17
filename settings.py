@@ -1,4 +1,4 @@
-#X = block, P = player, C = checkpoint empty layer: "                    "
+#X = block, P = player, C = checkpoint E = end empty layer: "                    "
 levels = [["                    ",
           "                    ",
           "                    ",
@@ -19,13 +19,13 @@ levels = [["                    ",
           "                    ",
           "                    ",
           "                    "]]
-screenWidth = 1200
-screenHeight = 800
+screenWidth = 1920#1200
+screenHeight = 1080#800
 
-tileSize = 128
+tileSize = screenWidth/15#rabbithole of resolution and camera size aligning starts here pls help
 deathHeight = len(levels[0]) * tileSize
 
-pWidth, pHeight = 50, 75
+pWidth, pHeight = tileSize/2.56, tileSize/1.7
 
 playerColor = (0, 0, 255)
 white = (255, 255, 255)

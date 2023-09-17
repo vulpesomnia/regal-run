@@ -5,7 +5,7 @@ class Camera:
         self.x, self.y = x, y
         self.player = player
 
-    def updatePosition(self):
+    def updatePosition(self):#Updates position of camera to player using linear interpolation aka just damping, how does it work? I forgot.
         player = self.player.sprite
         newX = self.x * 0.75 + (player.rect.x - screenWidth / 2) * 0.25
         newY = self.y * 0.75 + (player.rect.y - screenHeight / 2) * 0.25

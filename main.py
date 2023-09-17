@@ -26,7 +26,7 @@ while True:
     if level.reset == 0:#Wont reset
         level.tick()
     else:
-        if level.reset == 2:#End of level else is just death without checkpoint
+        if level.reset == 2:#End of level else is just death without checkpoint aka resets whole level
             levelCount += 1
         level = Level(levels[levelCount], screen)
         level.loadLevel()

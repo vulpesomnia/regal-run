@@ -44,7 +44,7 @@ class Level:
         self.render()
 
 
-    def render(self):
+    def render(self):#rendering function NOTE: Make object resizing dependent on resolution here and not in the other files.
         self.camera.updatePosition()
         for tile in self.tiles.sprites():
             camOffsetX = tile.rect.x - self.camera.x
