@@ -19,13 +19,18 @@ levels = [["                    ",
           "                    ",
           "                    ",
           "                    "]]
-screenWidth = 1920#1200
-screenHeight = 1080#800
+CONST_screenWidth = 1920
+CONST_screenHeight = 1080
 
-tileSize = screenWidth/15#rabbithole of resolution and camera size aligning starts here pls help
+
+#ratio = ~1.78(1.777)
+screenWidth = 1920#1200
+screenHeight = 1080#675
+
+tileSize = 128
 deathHeight = len(levels[0]) * tileSize
 
-pWidth, pHeight = tileSize/2.56, tileSize/1.7
+pWidth, pHeight = 50, 75
 
 playerColor = (0, 0, 255)
 white = (255, 255, 255)

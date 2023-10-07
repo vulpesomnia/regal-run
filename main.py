@@ -1,13 +1,15 @@
 import pygame
 import sys
+from pygame.locals import *
 
 from level import Level
 from settings import * 
 
 pygame.init()
 
-screen = pygame.display.set_mode((screenWidth, screenHeight))
+screen = pygame.display.set_mode((screenWidth, screenHeight), DOUBLEBUF)
 clock = pygame.time.Clock()
+renderingFrame = pygame.Surface((CONST_screenWidth, CONST_screenHeight))
 
 levelCount = 0
 
@@ -21,10 +23,9 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-    
-    screen.fill(white)
+    renderingFrame.fill(white)
     if level.reset == 0:#Wont reset
-        level.tick()
+        level.tick(renderingFrame)
     else:
         if level.reset == 2:#End of level else is just death without checkpoint aka resets whole level
             levelCount += 1

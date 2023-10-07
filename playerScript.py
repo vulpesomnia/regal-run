@@ -5,15 +5,16 @@ from settings import pHeight, pWidth, playerColor, tileSize
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((pWidth, pHeight))
-        self.image.fill(playerColor)
-        self.rect = self.image.get_rect(topleft = (x, y))
+        #self.sprite = pygame.transform(pygame.image.load("./Assets/Sprites/character.png").convert(), (pWidth, pHeight))
+        self.image = pygame.image.load("./Assets/Sprites/character.png").convert_alpha()#pygame.Surface((pWidth, pHeight))#the image
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() * 4, self.image.get_height() * 4))
+        self.rect = self.image.get_rect(topleft = (x, y))#box collider with size of image
 
         self.velocity = Vector2(0, 0)
         self.onGround = False
-        self.jumpStrength = tileSize*0.2#25
-        self.speed = tileSize*0.12#15
-        self.gravity = self.jumpStrength*0.08#2
+        self.jumpStrength = 25
+        self.speed = 15
+        self.gravity = 2
         self.jumpFrames = 0
         self.checkpoint = None
     def jump(self):
