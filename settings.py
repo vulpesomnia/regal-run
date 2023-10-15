@@ -30,7 +30,8 @@ screenHeight = 1080#675
 tileSize = 128
 deathHeight = len(levels[0]) * tileSize
 
-pWidth, pHeight = 50, 75
+pWidth, pHeight = 55, 75
+pAnimationFrames = ["walking1", "walking2", "walking3", "walking4", "flyingup", "flyingdown"]
 
 playerColor = (0, 0, 255)
 white = (255, 255, 255)

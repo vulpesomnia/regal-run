@@ -14,6 +14,7 @@ class Level:
         self.layout = layout
         self.player = pygame.sprite.GroupSingle()
         self.reset = 0
+        self.doRender = True
 
 
 
@@ -41,10 +42,11 @@ class Level:
     def tick(self, frame):
         self.player.update()
         self.horizontalMovementCollision()
-        self.render(frame)
+        #self.render(frame)
 
 
     def render(self, frame):#rendering function NOTE: Make object resizing dependent on resolution here and not in the other files.
+        frame.fill(white)
         self.camera.updatePosition()
         for tile in self.tiles.sprites():
             camOffsetX = tile.rect.x - self.camera.x
@@ -52,10 +54,12 @@ class Level:
             frame.blit(tile.image, (camOffsetX, camOffsetY))
         player = self.player.sprite
 
-        camOffsetX = player.rect.x - self.camera.x
-        camOffsetY = player.rect.y - self.camera.y
+        camOffsetX = player.rect.x - self.camera.x - player.image.get_width() / 2 + 25
+        camOffsetY = player.rect.y - self.camera.y - player.image.get_height() / 2 + 12
         frame.blit(player.image, (camOffsetX, camOffsetY))
         self.screen.blit(pygame.transform.scale(frame, (screenWidth, screenHeight)), (0, 0))
+        self.doRender = True
+
 
     def horizontalMovementCollision(self):
         player = self.player.sprite
