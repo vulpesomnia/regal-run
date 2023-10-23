@@ -43,7 +43,7 @@ while True:
                 level.editor.onClick(pos[0], pos[1])
         elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
-                    level.enableEditor()
+                    level.toggleEditor()
                 elif event.key == pygame.K_v:    
                     level.saveLevel()
             
@@ -57,7 +57,7 @@ while True:
         else:
             if level.reset == 2:#End of level else is just death without checkpoint aka resets whole level
                 levelCount += 1
-            level = Level(settings.levels[levelCount], screen)
+            level = Level("test", screen)
             level.loadLevel()
         accumulatedTime -= fixedTimeStep
 

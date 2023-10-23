@@ -65,10 +65,14 @@ class Level:
         self.player.update()
         self.horizontalMovementCollision()
 
-    def enableEditor(self):
-        settings.setGamemode(1)
+    def toggleEditor(self):
         player = self.player.sprite
-        player.speed = 18
+        if settings.gamemode == 0:
+            settings.setGamemode(1)
+            player.speed = 18
+        else:
+            settings.setGamemode(0)
+            player.speed = 13
 
     def render(self, frame):
         frame.fill(settings.white)

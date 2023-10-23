@@ -1,24 +1,4 @@
 #X = block, P = player, C = checkpoint E = end empty layer: "                    "
-levels = [["                    ",
-          "                    ",
-          "                    ",
-          "            E       ",
-          "           XX       ",
-          "      XX            ",
-          "           XX  C    ",
-          "               X    ",
-          "        P   XX X    ",
-          "XXXXXXXXXXXXXX X    "], 
-          ["                    ",
-          "         E          ",
-          "        XXX         ",
-          "     X   C   X      ",
-          "        XXX         ",
-          "    XX   P   XX     ",
-          "        XXX         ",
-          "                    ",
-          "                    ",
-          "                    "]]
 CONST_screenWidth = 1920
 CONST_screenHeight = 1080
 
@@ -28,7 +8,7 @@ screenWidth = 1920#1200
 screenHeight = 1080#675
 
 tileSize = 128
-deathHeight = len(levels[0]) * tileSize
+deathHeight = 16 * tileSize
 
 pWidth, pHeight = 55, 75
 pAnimationFrames = ["walking1", "walking2", "walking3", "walking4", "flyingup", "flyingdown"]
