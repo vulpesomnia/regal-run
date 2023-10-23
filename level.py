@@ -2,35 +2,57 @@
 from tile import Tile
 from playerScript import Player
 from camera import Camera
-from settings import * 
+import settings
+from editor import Editor
 import pygame
 
 tileTypes = {"X" : 0, "C" : 1, "E" : 2}
 
 class Level:
 
-    def __init__(self, layout, screen):
+    def __init__(self, name, screen):
+        self.name = name
         self.screen = screen
-        self.layout = layout
         self.player = pygame.sprite.GroupSingle()
         self.reset = 0
         self.doRender = True
+        self.editor = Editor(200)
+        settings.setGamemode(0)
 
 
 
     def loadLevel(self):
         self.tiles = pygame.sprite.Group()
-        for rowIndex, row in enumerate(self.layout):
-            for colIndex, col in enumerate(row):
-                x = colIndex * tileSize#Tilesize multiplication is so that the grid system works fine
-                y = rowIndex * tileSize
-                if col == "P":
-                    playerSprite = Player(x + tileSize/2 - pWidth/2, y)
-                    self.player.add(playerSprite)
-                    self.camera = Camera(x, y, self.player)
-                elif col != " ":
-                    tile = Tile(x, y, tileSize, tileTypes.get(col))
-                    self.tiles.add(tile)
+        levelFile = open("./Assets/Levels/" + self.name + ".level", "r")#Open file in reading mode
+        tileData = []
+        for rawData in levelFile:#loop through lines
+            tileData = rawData.split("|")#split data {x, y, tileID, imageID}
+            for index, data in enumerate(tileData):#cast as integers
+                tileData[index] = int(data)
+            x = settings.screenWidth - tileData[0] * settings.tileSize
+            y = settings.screenHeight - tileData[1] * settings.tileSize
+            tile = Tile(x, y, settings.tileSize, tileData[2], tileData[3])
+            self.tiles.add(tile)
+        playerSprite = Player(settings.screenWidth + settings.tileSize/2 - settings.pWidth/2, settings.screenHeight)
+        self.player.add(playerSprite)
+        self.camera = Camera(settings.screenWidth, settings.screenHeight, self.player)
+
+    def saveLevel(self):
+        levelFile = open("./Assets/Levels/" + self.name + ".level", "w")#Open file in writing mode (overrides text aka DO NOT CLOSE WHILE SAVING AAAAAAAAA[shouldnt be able to anyways since its fast])
+        for tile in self.tiles:
+            data = []
+            data.append(str(int((tile.rect.x - settings.screenWidth) / settings.tileSize * -1)))# x coordinate i calculated this with basic algebra
+            data.append(str(int((tile.rect.y - settings.screenHeight) / settings.tileSize * -1)))# y coordinate
+            data.append(str(tile.tileID))# tileid
+            data.append(str(tile.imageID))# imageid
+
+            levelFile.write("|".join(data) + "\n")
+        levelFile.close()
+        print("[LEVEL SAVE] " + self.name + ".level has been successfully saved!")
+
+            
+
+    
     def resetLevel(self):
         player = self.player.sprite
         if player.checkpoint != None:
@@ -39,14 +61,17 @@ class Level:
         else:
             self.reset = 1
                 
-    def tick(self, frame):
+    def tick(self):
         self.player.update()
         self.horizontalMovementCollision()
-        #self.render(frame)
 
+    def enableEditor(self):
+        settings.setGamemode(1)
+        player = self.player.sprite
+        player.speed = 18
 
-    def render(self, frame):#rendering function NOTE: Make object resizing dependent on resolution here and not in the other files.
-        frame.fill(white)
+    def render(self, frame):
+        frame.fill(settings.white)
         self.camera.updatePosition()
         for tile in self.tiles.sprites():
             camOffsetX = tile.rect.x - self.camera.x
@@ -57,49 +82,58 @@ class Level:
         camOffsetX = player.rect.x - self.camera.x - player.image.get_width() / 2 + 25
         camOffsetY = player.rect.y - self.camera.y - player.image.get_height() / 2 + 12
         frame.blit(player.image, (camOffsetX, camOffsetY))
-        self.screen.blit(pygame.transform.scale(frame, (screenWidth, screenHeight)), (0, 0))
+        if settings.gamemode == 1:
+            self.editor.draw(frame)
+        self.screen.blit(pygame.transform.scale(frame, (settings.screenWidth, settings.screenHeight)), (0, 0))
         self.doRender = True
 
 
     def horizontalMovementCollision(self):
         player = self.player.sprite
         player.rect.x += player.velocity.x * player.speed
-        for tile in self.tiles.sprites():
-            if tile.rect.colliderect(player.rect):
-                if tile.type == 0:
-                    if player.velocity.x < 0:
-                        player.rect.left = tile.rect.right
-                    elif player.velocity.x > 0:
-                        player.rect.right = tile.rect.left
-                else:
-                    self.generalCollision(tile)
+        if settings.gamemode == 0:
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if tile.tileID == 0:
+                        if player.velocity.x < 0:
+                            player.rect.left = tile.rect.right
+                        elif player.velocity.x > 0:
+                            player.rect.right = tile.rect.left
+                    else:
+                        self.generalCollision(tile)
         self.verticalMovementCollision()
     def verticalMovementCollision(self):
         player = self.player.sprite
-        player.rect.y -= player.velocity.y
-        onGround = False
-        for tile in self.tiles.sprites():
-            if tile.rect.colliderect(player.rect):
-                if tile.type == 0:
-                    if player.velocity.y < 0:
-                        player.rect.bottom = tile.rect.top
-                        player.velocity.y = 0
-                        onGround = True
-                    elif player.velocity.y > 0:
-                        player.rect.top = tile.rect.bottom
-                        player.velocity.y = 0
-                else:
-                    self.generalCollision(tile)
-        if player.onGround == True and onGround == False:
-            player.jumpFrames = 3
-        player.onGround = onGround
-        if self.player.sprite.rect.y > deathHeight:
-            self.resetLevel()
+        if settings.gamemode == 0:
+            player.rect.y -= player.velocity.y
+            onGround = False
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if tile.tileID == 0:
+                        if player.velocity.y < 0:
+                            player.rect.bottom = tile.rect.top
+                            player.velocity.y = 0
+                            onGround = True
+                        elif player.velocity.y > 0:
+                            player.rect.top = tile.rect.bottom
+                            player.velocity.y = 0
+                    else:
+                        self.generalCollision(tile)
+            if player.onGround == True and onGround == False:
+                player.jumpFrames = 3
+            player.onGround = onGround
+            if self.player.sprite.rect.y > settings.deathHeight:
+                self.resetLevel()
+        else: 
+            if player.velocity.y != -player.gravity:
+                player.rect.y -= player.velocity.y
+            player.velocity.y = 0
+            onGround = True
 
     def generalCollision(self, tile):
-        if tile.type == 1:
+        if tile.tileID == 1:
             self.player.sprite.checkpoint = (tile.rect.x + tile.rect.width / 2 - self.player.sprite.rect.width / 2, tile.rect.y)
-        elif tile.type == 2:
+        elif tile.tileID == 2:
             self.reset = 2
 
 

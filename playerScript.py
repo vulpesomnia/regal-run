@@ -1,18 +1,17 @@
 import pygame
 from vector import Vector2
-from settings import pWidth, pHeight, pAnimationFrames
+import settings
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.animationFrames = {}
-        for frame in pAnimationFrames:
+        for frame in settings.pAnimationFrames:
             temp = pygame.image.load("./Assets/Sprites/" + frame + ".png").convert_alpha()
             temp = pygame.transform.scale(temp, (temp.get_width() * 4, temp.get_height() * 4))
             self.animationFrames[frame] = temp
-        self.image = self.animationFrames["walking1"]#pygame.image.load("./Assets/Sprites/walking1.png").convert_alpha()
-        #self.image = pygame.transform.scale(self.image, (self.image.get_width() * 4, self.image.get_height() * 4))
-        self.rect = pygame.Rect((x, y), (pWidth, pHeight))#self.image.get_rect(topleft = (x, y))#box collider with size of image
+        self.image = self.animationFrames["walking1"]
+        self.rect = pygame.Rect((x, y), (settings.pWidth, settings.pHeight))
 
         self.velocity = Vector2(0, 0)
         self.onGround = False
@@ -25,9 +24,9 @@ class Player(pygame.sprite.Sprite):
         self.isFlipped = False
 
         self.animationTicks = 0
-    def jump(self):
+    def jump(self, direction):
         if self.onGround or self.jumpFrames > 0:
-            self.velocity.y = self.jumpStrength
+            self.velocity.y = self.jumpStrength * direction
 
     def getInput(self):
         keys = pygame.key.get_pressed()
@@ -42,7 +41,9 @@ class Player(pygame.sprite.Sprite):
         else:
             self.velocity.x = 0
         if keys[pygame.K_SPACE]:
-            self.jump()
+            self.jump(1)
+        elif keys[pygame.K_LSHIFT] and settings.gamemode == 1:
+            self.jump(-1)
 
     def swapImage(self):
         self.isFlipped = not self.isFlipped
@@ -66,16 +67,16 @@ class Player(pygame.sprite.Sprite):
                 self.updateImage("walking1")
             else:
                 #walking animation
-                if self.animationTicks <= 10:
+                if self.animationTicks <= 7:
                     self.animationTicks += 1
                     self.updateImage("walking1")
-                elif self.animationTicks <= 20:
+                elif self.animationTicks <= 15:
                     self.animationTicks += 1
                     self.updateImage("walking2")
-                elif self.animationTicks <= 30:
+                elif self.animationTicks <= 22:
                     self.animationTicks += 1
                     self.updateImage("walking3")
-                elif self.animationTicks <= 40:
+                elif self.animationTicks <= 30:
                     self.animationTicks += 1
                     self.updateImage("walking4")
                 else:

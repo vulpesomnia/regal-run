@@ -8,7 +8,7 @@ levels = [["                    ",
           "           XX  C    ",
           "               X    ",
           "        P   XX X    ",
-          "       XXXXXXX X    "], 
+          "XXXXXXXXXXXXXX X    "], 
           ["                    ",
           "         E          ",
           "        XXX         ",
@@ -32,9 +32,18 @@ deathHeight = len(levels[0]) * tileSize
 
 pWidth, pHeight = 55, 75
 pAnimationFrames = ["walking1", "walking2", "walking3", "walking4", "flyingup", "flyingdown"]
+tileSpriteCount = 51
 
 playerColor = (0, 0, 255)
 white = (255, 255, 255)
 groundColor = (255, 0, 0)
 checkpointColor = (255, 255, 0)
 endColor = (0, 255, 0)
+
+gamemode = 0
+
+def setGamemode(int):
+    global gamemode
+    gamemode = int
+
+#x(int), y(int), type(int), sprite(string)
