@@ -4,7 +4,7 @@ from playerScript import Player
 from camera import Camera
 import settings
 from editor import Editor
-import pygame
+import pygame, math
 
 tileTypes = {"X" : 0, "C" : 1, "E" : 2}
 
@@ -21,7 +21,7 @@ class Level:
 
 
 
-    def loadLevel(self):
+    def loadLevel(self):#TODO: create layer flag for different layers
         self.tiles = pygame.sprite.Group()
         levelFile = open("./Assets/Levels/" + self.name + ".level", "r")#Open file in reading mode
         tileData = []
@@ -29,15 +29,14 @@ class Level:
             tileData = rawData.split("|")#split data {x, y, tileID, imageID}
             for index, data in enumerate(tileData):#cast as integers
                 tileData[index] = int(data)
-            x = settings.screenWidth - tileData[0] * settings.tileSize
-            y = settings.screenHeight - tileData[1] * settings.tileSize
+            x, y = Level.worldToScreenSpace(tileData[0], tileData[1])
             tile = Tile(x, y, settings.tileSize, tileData[2], tileData[3])
             self.tiles.add(tile)
         playerSprite = Player(settings.screenWidth + settings.tileSize/2 - settings.pWidth/2, settings.screenHeight)
         self.player.add(playerSprite)
         self.camera = Camera(settings.screenWidth, settings.screenHeight, self.player)
 
-    def saveLevel(self):
+    def saveLevel(self):#NOTE: fun todo maybe create a squared saving system to save some space luls (sort col and rows in group -> check square regions of same type&image&layer -> save square regions with corners)
         levelFile = open("./Assets/Levels/" + self.name + ".level", "w")#Open file in writing mode (overrides text aka DO NOT CLOSE WHILE SAVING AAAAAAAAA[shouldnt be able to anyways since its fast])
         for tile in self.tiles:
             data = []
@@ -49,6 +48,7 @@ class Level:
             levelFile.write("|".join(data) + "\n")
         levelFile.close()
         print("[LEVEL SAVE] " + self.name + ".level has been successfully saved!")
+    
 
             
 
@@ -75,7 +75,7 @@ class Level:
             player.speed = 13
 
     def render(self, frame):
-        frame.fill(settings.white)
+        frame.fill(settings.backgroundColor)
         self.camera.updatePosition()
         for tile in self.tiles.sprites():
             camOffsetX = tile.rect.x - self.camera.x
@@ -85,7 +85,7 @@ class Level:
 
         camOffsetX = player.rect.x - self.camera.x - player.image.get_width() / 2 + 25
         camOffsetY = player.rect.y - self.camera.y - player.image.get_height() / 2 + 12
-        frame.blit(player.image, (camOffsetX, camOffsetY))
+        frame.blit(player.image, (camOffsetX-settings.pWidth/4, camOffsetY))
         if settings.gamemode == 1:
             self.editor.draw(frame)
         self.screen.blit(pygame.transform.scale(frame, (settings.screenWidth, settings.screenHeight)), (0, 0))
@@ -135,11 +135,25 @@ class Level:
             onGround = True
 
     def generalCollision(self, tile):
-        if tile.tileID == 1:
+        if tile.tileID == 3:
             self.player.sprite.checkpoint = (tile.rect.x + tile.rect.width / 2 - self.player.sprite.rect.width / 2, tile.rect.y)
-        elif tile.tileID == 2:
+        elif tile.tileID == 4:
             self.reset = 2
+        elif tile.tileID == 1:
+            self.resetLevel()
 
+
+    # - These are for tilesets not floating point world coordinates. - #
+    def worldToScreenSpace(x, y):
+        x = settings.screenWidth - x * settings.tileSize
+        y = settings.screenHeight - y * settings.tileSize
+        return (x, y)
+    
+    def screenToWorldSpace(level, x, y):#x + camera offset for world coordinates - screenwidth for 0, 0 to be at player spawn point divided by tilesize and floored to get x of a tile
+        x = math.floor((x+level.camera.x - settings.screenWidth)/settings.tileSize) * -1
+        y = math.floor((y+level.camera.y - settings.screenHeight)/settings.tileSize) * -1
+        return (x, y)
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -#
 
 
         

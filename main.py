@@ -15,12 +15,20 @@ renderingFrame = pygame.Surface((settings.CONST_screenWidth, settings.CONST_scre
 levelCount = 0
 
 pygame.display.set_caption("Platformer Game")
+
+for i in range(1, settings.tileSpriteCount+1):
+    temp = pygame.image.load("./Assets/Sprites/Tiles/tile" + str(i) + ".png").convert_alpha()
+    settings.tileSprites.append(temp)
+
 level = Level("test", screen)
 level.loadLevel()
 
 fixedTimeStep = 1.0 / 45.0 #60fps timestep
 accumulatedTime = 0
 currentTime = pygame.time.get_ticks()
+
+
+
 # Main game loop
 while True:
     #Get difference of time between last frame and current frame
@@ -29,19 +37,25 @@ while True:
     currentTime = newTime
     accumulatedTime += frameTime# Accumulate it into a variable
 
-    #disables pygame and system libraries on program exit
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:#disables pygame and system libraries on program exit
             pygame.quit()
             sys.exit()
-        elif (event.type == pygame.MOUSEBUTTONUP) and (settings.gamemode == 1):#Check if clicked and if gamemode is editing mode
-            pos = pygame.mouse.get_pos()
-            x = math.floor((pos[0]+level.camera.x - settings.screenWidth)/settings.tileSize)#Click.x + camera offset for world coordinates - screenwidth for 0, 0 to be at player spawn point divided by tilesize and floored to get x of a tile
-            y = math.floor((pos[1]+level.camera.y - settings.screenHeight)/settings.tileSize)#same thing just y coordinate
-            print(str(x) + ", " + str(y))#Coordinate of the tile you just clicked on
-            if pos[1] > settings.screenHeight-200:
-                level.editor.onClick(pos[0], pos[1])
-        elif event.type == pygame.KEYDOWN:
+        elif settings.gamemode == 1:#Check if clicked and if gamemode is editing mode
+            if event.type == pygame.MOUSEBUTTONUP:
+                pos = pygame.mouse.get_pos()
+                x, y = Level.screenToWorldSpace(level, pos[0], pos[1])
+                if pos[1] > settings.screenHeight-200:
+                    level.editor.onClick(pos[0], pos[1])
+                elif event.button == 1:
+                    level.editor.createTile(level, x, y)
+                elif event.button == 3:
+                    x, y = Level.worldToScreenSpace(x, y)
+                    for tile in level.tiles:
+                        if (tile.rect.x == x) and (tile.rect.y == y):
+                            level.editor.removeTile(tile)
+                            break
+        if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
                     level.toggleEditor()
                 elif event.key == pygame.K_v:    

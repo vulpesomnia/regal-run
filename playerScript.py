@@ -8,14 +8,14 @@ class Player(pygame.sprite.Sprite):
         self.animationFrames = {}
         for frame in settings.pAnimationFrames:
             temp = pygame.image.load("./Assets/Sprites/" + frame + ".png").convert_alpha()
-            temp = pygame.transform.scale(temp, (temp.get_width() * 4, temp.get_height() * 4))
+            temp = pygame.transform.scale(temp, (temp.get_width() * 4.25, temp.get_height() * 4.25))
             self.animationFrames[frame] = temp
         self.image = self.animationFrames["walking1"]
         self.rect = pygame.Rect((x, y), (settings.pWidth, settings.pHeight))
 
         self.velocity = Vector2(0, 0)
         self.onGround = False
-        self.jumpStrength = 25
+        self.jumpStrength = 20
         self.speed = 13
         self.gravity = 1.7
         self.jumpFrames = 0
