@@ -7,6 +7,7 @@ from level import Level
 import settings
 
 pygame.init()
+settings.initializeFont()
 
 screen = pygame.display.set_mode((settings.screenWidth, settings.screenHeight))
 clock = pygame.time.Clock()
@@ -46,15 +47,15 @@ while True:
                 pos = pygame.mouse.get_pos()
                 x, y = Level.screenToWorldSpace(level, pos[0], pos[1])
                 if pos[1] > settings.screenHeight-200:
-                    level.editor.onClick(pos[0], pos[1])
+                    level.editor.onClick(pos[0], pos[1], event.button)
                 elif event.button == 1:
+                    x = settings.screenWidth - x * settings.tileSize
+                    y = settings.screenHeight - y * settings.tileSize
                     level.editor.createTile(level, x, y)
                 elif event.button == 3:
-                    x, y = Level.worldToScreenSpace(x, y)
-                    for tile in level.tiles:
-                        if (tile.rect.x == x) and (tile.rect.y == y):
-                            level.editor.removeTile(tile)
-                            break
+                    x = settings.screenWidth - x * settings.tileSize
+                    y = settings.screenHeight - y * settings.tileSize
+                    level.editor.removeTile(level, x, y)
         if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
                     level.toggleEditor()

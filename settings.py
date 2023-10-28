@@ -23,10 +23,14 @@ endColor = (0, 255, 0)
 
 gamemode = 0
 tileSprites = []
-
+font = None
 
 def setGamemode(int):
     global gamemode
     gamemode = int
+
+def initializeFont():
+    global font
+    font = pygame.font.SysFont("arial", 30)
 
 #load all images

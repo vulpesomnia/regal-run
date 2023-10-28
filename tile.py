@@ -4,10 +4,11 @@ import settings
 #tileColors = (groundColor, checkpointColor, endColor)
 
 class Tile(pygame.sprite.Sprite):#Tileids: 0 = collision tile, 1 = no collision, 2 = death, 3 = checkpoint, 4 = end point
-    def __init__(self, x, y, size, tileID, imageID):
+    def __init__(self, x, y, size, tileID, imageID, layer):
         super().__init__()
         self.imageID = imageID
         self.tileID = tileID
+        self.layer = layer
         self.image = pygame.Surface((size, size))
         if self.imageID != 0:
             self.image = settings.tileSprites[self.imageID-1]
