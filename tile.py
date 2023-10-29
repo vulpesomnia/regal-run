@@ -6,6 +6,8 @@ import settings
 class Tile(pygame.sprite.Sprite):#Tileids: 0 = collision tile, 1 = no collision, 2 = death, 3 = checkpoint, 4 = end point
     def __init__(self, x, y, size, tileID, imageID, layer):
         super().__init__()
+        self.x = int((x - settings.screenWidth) / settings.tileSize * -1)
+        self.y = int((y - settings.screenHeight) / settings.tileSize * -1)
         self.imageID = imageID
         self.tileID = tileID
         self.layer = layer

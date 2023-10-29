@@ -68,5 +68,6 @@ class Editor:
             for tile in layer.sprites():
                 if layerID == self.selectedLayer:
                     if (tile.rect.x == x) and (tile.rect.y == y):
+                        print("LayerID: " + str(layerID) + " selectedLayer: " + str(self.selectedLayer))
                         tile.kill()
                         del tile

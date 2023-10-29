@@ -19,8 +19,6 @@ class Level:
         self.editor = Editor(200)
         settings.setGamemode(0)
 
-
-
     def loadLevel(self):#TODO: create layer flag for different layers
         self.tiles = {0 : pygame.sprite.Group()}
         levelFile = open("./Assets/Levels/" + self.name + ".level", "r")#Open file in reading mode
@@ -44,18 +42,150 @@ class Level:
         self.camera = Camera(settings.screenWidth, settings.screenHeight, self.player)
 
 
+    def loadLevel_squared(self):#TODO: create layer flag for different layers
+        self.tiles = {0 : pygame.sprite.Group()}
+        levelFile = open("./Assets/Levels/" + self.name + ".level", "r")#Open file in reading mode
+        tileData = []
+        for rawData in levelFile:#loop through lines
+            if rawData == "\n":
+                break
+            tileData = rawData.split("|")#split data{x, y, tileID, imageID}
+
+            for index, data in enumerate(tileData):#cast as integers
+                if index != 0:
+                    tileData[index] = int(data)
+
+            boundaries = tileData[0].split(",")
+            for index, data in enumerate(boundaries):#cast as integers
+                boundaries[index] = int(data)
+            for i in range(min(boundaries[1], boundaries[3]), max(boundaries[1], boundaries[3])+1):#y
+                y = Level.worldToScreenSpace(0, i)[1]
+                for j in range(boundaries[2], boundaries[0]+1):#x
+                    x = Level.worldToScreenSpace(j, 0)[0]
+                    tile = Tile(x, y, settings.tileSize, tileData[1], tileData[2], tileData[3])
+                    layer = tileData[3]
+                    if self.tiles.get(layer) is None:
+                        self.tiles[layer] = pygame.sprite.Group()
+                    self.tiles[layer].add(tile)
+
+        self.tiles = dict(sorted(self.tiles.items()))
+
+        playerSprite = Player(settings.screenWidth + settings.tileSize/2 - settings.pWidth/2, settings.screenHeight)
+        self.player.add(playerSprite)
+        self.camera = Camera(settings.screenWidth, settings.screenHeight, self.player)
+
+
 
     def saveLevel(self):#NOTE: fun todo maybe create a squared saving system to save some space luls (sort col and rows in group -> check square regions of same type&image&layer -> save square regions with corners)
         levelFile = open("./Assets/Levels/" + self.name + ".level", "w")#Open file in writing mode (overrides text aka DO NOT CLOSE WHILE SAVING AAAAAAAAA[shouldnt be able to anyways since its fast])
         for layerID, layer in self.tiles.items():
             for tile in layer.sprites():
                 data = []
-                data.append(str(int((tile.rect.x - settings.screenWidth) / settings.tileSize * -1)))# x coordinate i calculated this with basic algebra
-                data.append(str(int((tile.rect.y - settings.screenHeight) / settings.tileSize * -1)))# y coordinate
+                data.append(str(int(tile.x)))# x coordinate
+                data.append(str(int(tile.y)))# y coordinate
                 data.append(str(tile.tileID))# tileid
                 data.append(str(tile.imageID))# imageid
                 data.append(str(tile.layer))# layer
                 levelFile.write("|".join(data) + "\n")
+        levelFile.close()
+        print("[LEVEL SAVE] " + self.name + ".level has been successfully saved!")
+
+    def saveLevel_squared(self):
+
+        sortedTiles = {}#{Layer(INT) : {y-coordinate(INT) : [x-coordinates(INT)]}}, basically sorted as such: depth, col, row
+        for layerID, layer in self.tiles.items():# (Sort tiles from highest y and highest x to lowest y and lowest x)
+            if sortedTiles.get(layerID) == None:
+                sortedTiles[layerID] = {}
+            for tile in layer.sprites():
+                if sortedTiles[layerID].get(tile.y) == None:
+                    sortedTiles[layerID][tile.y] = [tile]
+                else:
+                    for index, sortedTile in enumerate(sortedTiles[layerID][tile.y]):
+                        if tile.x > sortedTile.x:
+                            sortedTiles[layerID][tile.y].insert(index, tile)
+                            break
+                        elif index == len(sortedTiles[layerID][tile.y])-1:
+                            sortedTiles[layerID][tile.y].append(tile)
+                            break
+
+        keys = sortedTiles.keys()
+        
+        for key in keys:
+            sortedTiles[key] = dict(sorted(sortedTiles[key].items(), reverse=True))
+
+        squaredChunks = []#[(x,y), (x,y), tileid, imageid, layerid]
+
+
+        for layer in sortedTiles.keys():
+            while settings.dictLength(sortedTiles[layer]) != 0:#{x,y,x,y}|TileID|ImageID|LayerID
+                tempSquare = [(0, 0), (0, 0), 0, 0, 0]
+                tilesToRemove = []
+                currentX = 0
+                endX = 0
+                endY = 0
+                count = 0
+                for yKey, tiles in sortedTiles[layer].items():#loop through y levels
+                    for index, tile in enumerate(tiles):
+                        count += 1
+                        if count == 1:#Get first tile for chunk
+                            tempSquare[0] = (tile.x, tile.y)
+                            tempSquare[2] = tile.tileID
+                            tempSquare[3] = tile.imageID
+                            tempSquare[4] = layer
+                            currentX = tile.x
+                            endY = yKey
+                            endX = tile.x
+                        elif (tile.x == currentX-1) and ((tile.tileID == tempSquare[2]) and (tile.imageID == tempSquare[3])):#check if tile data matches chunk's data
+                                currentX = tile.x
+                                endY = yKey
+                        else:#if tile doesnt match chunk data
+                            if endY == yKey:#If we have atleast 1 tile in this y level then we can put the endX to the currentX
+                                endX = currentX
+                            break
+                        endX = currentX#this should work maybe?
+                    currentX = tempSquare[0][0]+1#Put currentx to x of starting tile, +1 is for the if statement to work
+                    if endY != yKey:
+                        break
+
+
+
+                tempSquare[1] = (endX, endY)
+
+                for yKey, tiles in sortedTiles[layer].items():#add tiles in chunk to be removed
+                    for tile in tiles:
+                        if (tile.x <= tempSquare[0][0]) and (tile.y <= tempSquare[0][1]):#if tile x is less than
+                            if (tile.x >= tempSquare[1][0]) and (tile.y >= tempSquare[1][1]):
+                                if (tile.layer == tempSquare[4]):
+                                    tilesToRemove.append(tile)
+
+                squaredChunks.append(tempSquare)#Add square to total squares
+
+                yKeys = []
+                for yKey in sortedTiles[layer].keys():
+                    yKeys.append(yKey)
+                for tileToRemove in tilesToRemove:
+                    for yKey in yKeys:#remove looped tiles from sortedtiles list
+                        if tileToRemove in sortedTiles[layer][yKey]:
+                            sortedTiles[layer][yKey].remove(tileToRemove)
+                    
+                for yKey in yKeys:
+                    if len(sortedTiles[layer][yKey]) == 0:
+                        del sortedTiles[layer][yKey]
+        levelFile = open("./Assets/Levels/" + self.name + ".level", "w")
+        for chunk in squaredChunks:#{x,y,x,y}|TileID|ImageID|LayerID
+            boundaries = []
+            boundaries.append(str(chunk[0][0]))
+            boundaries.append(str(chunk[0][1]))
+            boundaries.append(str(chunk[1][0]))
+            boundaries.append(str(chunk[1][1]))
+            boundaries = ",".join(boundaries)
+
+            data = []
+            data.append(boundaries)
+            data.append(str(chunk[2]))# tileid
+            data.append(str(chunk[3]))# imageid
+            data.append(str(chunk[4]))# layer
+            levelFile.write("|".join(data) + "\n")
         levelFile.close()
         print("[LEVEL SAVE] " + self.name + ".level has been successfully saved!")
     

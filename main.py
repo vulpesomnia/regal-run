@@ -22,7 +22,7 @@ for i in range(1, settings.tileSpriteCount+1):
     settings.tileSprites.append(temp)
 
 level = Level("test", screen)
-level.loadLevel()
+level.loadLevel_squared()
 
 fixedTimeStep = 1.0 / 45.0 #60fps timestep
 accumulatedTime = 0
@@ -60,7 +60,7 @@ while True:
                 if event.key == pygame.K_c:
                     level.toggleEditor()
                 elif event.key == pygame.K_v:    
-                    level.saveLevel()
+                    level.saveLevel_squared()
             
 
 
@@ -73,7 +73,7 @@ while True:
             if level.reset == 2:#End of level else is just death without checkpoint aka resets whole level
                 levelCount += 1
             level = Level("test", screen)
-            level.loadLevel()
+            level.loadLevel_squared()
         accumulatedTime -= fixedTimeStep
 
 

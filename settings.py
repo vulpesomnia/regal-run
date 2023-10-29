@@ -9,7 +9,7 @@ screenWidth = 1920#1200
 screenHeight = 1080#675
 
 tileSize = 96
-deathHeight = 12 * tileSize
+deathHeight = 16 * tileSize
 
 pWidth, pHeight = 40, 80
 pAnimationFrames = ["walking1", "walking2", "walking3", "walking4", "flyingup", "flyingdown"]
@@ -32,5 +32,12 @@ def setGamemode(int):
 def initializeFont():
     global font
     font = pygame.font.SysFont("arial", 30)
+
+def dictLength(dict):
+    length = 0
+    for key, values in dict.items():
+        length += len(values)
+    return length
+
 
 #load all images
