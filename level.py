@@ -27,7 +27,7 @@ class Level:
             tileData = rawData.split("|")#split data {x, y, tileID, imageID}
             for index, data in enumerate(tileData):#cast as integers
                 tileData[index] = int(data)
-            x, y = Level.worldToScreenSpace(tileData[0], tileData[1])
+            x, y = settings.worldToScreenSpace(tileData[0], tileData[1])
             tile = Tile(x, y, settings.tileSize, tileData[2], tileData[3], 0)
             layer = 0
             if len(tileData) >= 5:
@@ -59,9 +59,9 @@ class Level:
             for index, data in enumerate(boundaries):#cast as integers
                 boundaries[index] = int(data)
             for i in range(min(boundaries[1], boundaries[3]), max(boundaries[1], boundaries[3])+1):#y
-                y = Level.worldToScreenSpace(0, i)[1]
+                y = settings.worldToScreenSpace(0, i)[1]
                 for j in range(boundaries[2], boundaries[0]+1):#x
-                    x = Level.worldToScreenSpace(j, 0)[0]
+                    x = settings.worldToScreenSpace(j, 0)[0]
                     tile = Tile(x, y, settings.tileSize, tileData[1], tileData[2], tileData[3])
                     layer = tileData[3]
                     if self.tiles.get(layer) is None:
@@ -266,9 +266,8 @@ class Level:
                                 player.velocity.y = 0
                         else:
                             self.generalCollision(tile)
-            if player.onGround == True and onGround == False:
-                player.jumpFrames = 3
-            player.onGround = onGround
+            if onGround == True:
+                player.jumpFrames = 4
             if self.player.sprite.rect.y > settings.deathHeight:
                 self.resetLevel()
         else: 
@@ -286,17 +285,6 @@ class Level:
             self.resetLevel()
 
 
-    # - These are for tilesets not floating point world coordinates. - #
-    def worldToScreenSpace(x, y):
-        x = settings.screenWidth - x * settings.tileSize
-        y = settings.screenHeight - y * settings.tileSize
-        return (x, y)
-    
-    def screenToWorldSpace(level, x, y):#x + camera offset for world coordinates - screenwidth for 0, 0 to be at player spawn point divided by tilesize and floored to get x of a tile
-        x = math.floor((x+level.camera.x - settings.screenWidth)/settings.tileSize) * -1
-        y = math.floor((y+level.camera.y - settings.screenHeight)/settings.tileSize) * -1
-        return (x, y)
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -#
 
 
         

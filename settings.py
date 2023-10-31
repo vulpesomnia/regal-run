@@ -1,4 +1,4 @@
-import pygame
+import pygame, math
 #X = block, P = player, C = checkpoint E = end empty layer: "                    "
 CONST_screenWidth = 1920
 CONST_screenHeight = 1080
@@ -38,6 +38,18 @@ def dictLength(dict):
     for key, values in dict.items():
         length += len(values)
     return length
+
+# - These are for tilesets not floating point world coordinates. - #
+def worldToScreenSpace(x, y):
+    x = screenWidth - x * tileSize
+    y = screenHeight - y * tileSize
+    return (x, y)
+    
+def screenToWorldSpace(level, x, y):#x + camera offset for world coordinates - screenwidth for 0, 0 to be at player spawn point divided by tilesize and floored to get x of a tile
+    x = math.floor((x+level.camera.x - screenWidth)/tileSize) * -1
+    y = math.floor((y+level.camera.y - screenHeight)/tileSize) * -1
+    return (x, y)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -#
 
 
 #load all images

@@ -14,19 +14,23 @@ class Player(pygame.sprite.Sprite):
         self.rect = pygame.Rect((x, y), (settings.pWidth, settings.pHeight))
 
         self.velocity = Vector2(0, 0)
-        self.onGround = False
-        self.jumpStrength = 20
+        #self.onGround = False
+        self.jumpStrength = 23
         self.speed = 13
         self.gravity = 1.7
         self.jumpFrames = 0
         self.checkpoint = None
+        self.jumpSound = pygame.mixer.Sound("./Assets/Sounds/jump.wav")
 
         self.isFlipped = False
 
         self.animationTicks = 0
     def jump(self, direction):
-        if self.onGround or self.jumpFrames > 0:
+        if self.jumpFrames > 0:
             self.velocity.y = self.jumpStrength * direction
+            if (settings.gamemode == 0):
+                    self.jumpFrames = 0
+                    pygame.mixer.Sound.play(self.jumpSound)
 
     def getInput(self):
         keys = pygame.key.get_pressed()
@@ -52,7 +56,10 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.getInput()
         self.velocity.y -= self.gravity #Gravity of player
-        self.jumpFrames = max(0, self.jumpFrames - 1)
+        if settings.gamemode == 1:
+            self.jumpFrames = 4
+        else:
+            self.jumpFrames = max(0, self.jumpFrames - 1)
         self.animationTick()
 
     def updateImage(self, image):
@@ -61,7 +68,7 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image, True, False)
 
     def animationTick(self):
-        if self.onGround == True:
+        if self.jumpFrames > 0:
             if self.velocity.x == 0:
                 #idle animation
                 self.updateImage("walking1")

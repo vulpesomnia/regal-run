@@ -44,18 +44,30 @@ while True:
             sys.exit()
         elif settings.gamemode == 1:#Check if clicked and if gamemode is editing mode
             if event.type == pygame.MOUSEBUTTONUP:
+
+                #Get second coordinate and stop showing preview
+                selCords = level.editor.selectionCoordinates
+
                 pos = pygame.mouse.get_pos()
-                x, y = Level.screenToWorldSpace(level, pos[0], pos[1])
+                x, y = settings.screenToWorldSpace(level, pos[0], pos[1])#get world coordinate of tile at clicked coordinate
                 if pos[1] > settings.screenHeight-200:
                     level.editor.onClick(pos[0], pos[1], event.button)
                 elif event.button == 1:
-                    x = settings.screenWidth - x * settings.tileSize
-                    y = settings.screenHeight - y * settings.tileSize
-                    level.editor.createTile(level, x, y)
+                    level.editor.createTile(level, (selCords[0], selCords[1]), (x, y))
                 elif event.button == 3:
-                    x = settings.screenWidth - x * settings.tileSize
-                    y = settings.screenHeight - y * settings.tileSize
-                    level.editor.removeTile(level, x, y)
+                    level.editor.removeTile(level, (selCords[0], selCords[1]), (x, y))
+                level.editor.selectionCoordinates = None
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+
+
+                #Get first coordinate and ##also if statement to render preview##
+                pos = pygame.mouse.get_pos()
+                x, y = settings.screenToWorldSpace(level, pos[0], pos[1])#get world coordinate of tile at clicked coordinate
+
+                level.editor.selectionCoordinates = (x, y)
+        
+
+
         if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
                     level.toggleEditor()
