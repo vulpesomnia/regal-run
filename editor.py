@@ -3,23 +3,25 @@ from button import Button
 from tile import Tile
 
 colCount = 28
-buttonSize = 64 #Cubic
+buttonSize = 48 #Cubic
 
 class Editor:
 
     def __init__(self, height):
-        self.selectionCoordinates = None#Use for selection
+        self.selectionCoordinates = None
+
         self.selectedImage = 0
         self.selectedType = 0
-        self.selectedLayer = 0#array of sprite groups? for loop in render function then or hashmap {layerid : spritegroup} for negative "index" support
+        self.selectedLayer = 0
+
         self.height = height
         self.buttons = []
-        #self.rect = pygame.rect(0, settings.screenHeight-self.height, settings.screenWidth, self.height)
+
         for i in range(settings.tileSpriteCount):
-            x = i * buttonSize - math.floor(i/colCount) * (colCount-1) * buttonSize + 15
+            x = i * buttonSize - math.floor(i/colCount) * (colCount) * buttonSize + 15
             y = settings.screenHeight-self.height + math.floor(1 + i/colCount) * buttonSize - 10
             temp = settings.tileSprites[i]
-            temp = pygame.transform.scale(temp, (temp.get_width() * 4, temp.get_height() * 4))
+            temp = pygame.transform.scale(temp, (temp.get_width() * 3, temp.get_height() * 3))
             button = Button(x, y, 1, temp)
             self.buttons.append(button)
         self.buttons.append(Button(settings.screenWidth-200, settings.screenHeight-190, 2))#TileID

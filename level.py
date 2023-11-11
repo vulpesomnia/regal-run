@@ -4,9 +4,7 @@ from playerScript import Player
 from camera import Camera
 import settings
 from editor import Editor
-import pygame, math
-
-tileTypes = {"X" : 0, "C" : 1, "E" : 2}
+import pygame
 
 class Level:
 
@@ -19,32 +17,9 @@ class Level:
         self.editor = Editor(200)
         settings.setGamemode(0)
 
-    def loadLevel(self):#TODO: create layer flag for different layers
-        self.tiles = {0 : pygame.sprite.Group()}
-        levelFile = open("./Assets/Levels/" + self.name + ".level", "r")#Open file in reading mode
-        tileData = []
-        for rawData in levelFile:#loop through lines
-            tileData = rawData.split("|")#split data {x, y, tileID, imageID}
-            for index, data in enumerate(tileData):#cast as integers
-                tileData[index] = int(data)
-            x, y = settings.worldToScreenSpace(tileData[0], tileData[1])
-            tile = Tile(x, y, settings.tileSize, tileData[2], tileData[3], 0)
-            layer = 0
-            if len(tileData) >= 5:
-                layer = tileData[4]
-            if self.tiles.get(layer) is None:
-                self.tiles[layer] = pygame.sprite.Group()
-            self.tiles[layer].add(tile)
-        self.tiles = dict(sorted(self.tiles.items()))
-
-        playerSprite = Player(settings.screenWidth + settings.tileSize/2 - settings.pWidth/2, settings.screenHeight)
-        self.player.add(playerSprite)
-        self.camera = Camera(settings.screenWidth, settings.screenHeight, self.player)
-
-
     def loadLevel_squared(self):#TODO: create layer flag for different layers
         self.tiles = {0 : pygame.sprite.Group()}
-        levelFile = open("./Assets/Levels/" + self.name + ".level", "r")#Open file in reading mode
+        levelFile = open("./Assets/Levels/" + self.name, "r")#Open file in reading mode
         tileData = []
         for rawData in levelFile:#loop through lines
             if rawData == "\n":
@@ -73,22 +48,6 @@ class Level:
         playerSprite = Player(settings.screenWidth + settings.tileSize/2 - settings.pWidth/2, settings.screenHeight)
         self.player.add(playerSprite)
         self.camera = Camera(settings.screenWidth, settings.screenHeight, self.player)
-
-
-
-    def saveLevel(self):#NOTE: fun todo maybe create a squared saving system to save some space luls (sort col and rows in group -> check square regions of same type&image&layer -> save square regions with corners)
-        levelFile = open("./Assets/Levels/" + self.name + ".level", "w")#Open file in writing mode (overrides text aka DO NOT CLOSE WHILE SAVING AAAAAAAAA[shouldnt be able to anyways since its fast])
-        for layerID, layer in self.tiles.items():
-            for tile in layer.sprites():
-                data = []
-                data.append(str(int(tile.x)))# x coordinate
-                data.append(str(int(tile.y)))# y coordinate
-                data.append(str(tile.tileID))# tileid
-                data.append(str(tile.imageID))# imageid
-                data.append(str(tile.layer))# layer
-                levelFile.write("|".join(data) + "\n")
-        levelFile.close()
-        print("[LEVEL SAVE] " + self.name + ".level has been successfully saved!")
 
     def saveLevel_squared(self):
 
@@ -171,7 +130,7 @@ class Level:
                 for yKey in yKeys:
                     if len(sortedTiles[layer][yKey]) == 0:
                         del sortedTiles[layer][yKey]
-        levelFile = open("./Assets/Levels/" + self.name + ".level", "w")
+        levelFile = open("./Assets/Levels/" + self.name, "w")
         for chunk in squaredChunks:#{x,y,x,y}|TileID|ImageID|LayerID
             boundaries = []
             boundaries.append(str(chunk[0][0]))
@@ -217,16 +176,21 @@ class Level:
     def render(self, frame):
         frame.fill(settings.backgroundColor)
         self.camera.updatePosition()
+        renderPlayer = True
         for layerID, layer in self.tiles.items():
+            if (layerID == 1) and (settings.gamemode == 0):
+                player = self.player.sprite
+                player.render(frame, self.camera)
+                renderPlayer = False
             for tile in layer.sprites():
                 camOffsetX = tile.rect.x - self.camera.x
                 camOffsetY = tile.rect.y - self.camera.y
                 frame.blit(tile.image, (camOffsetX, camOffsetY))
-        player = self.player.sprite
+        if renderPlayer == True:
+            player = self.player.sprite
+            player.render(frame, self.camera)
 
-        camOffsetX = player.rect.x - self.camera.x - player.image.get_width() / 2 + 25
-        camOffsetY = player.rect.y - self.camera.y - player.image.get_height() / 2 + 12
-        frame.blit(player.image, (camOffsetX-settings.pWidth/4, camOffsetY))
+        
         if settings.gamemode == 1:
             self.editor.draw(frame)
         self.screen.blit(pygame.transform.scale(frame, (settings.screenWidth, settings.screenHeight)), (0, 0))

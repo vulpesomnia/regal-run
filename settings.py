@@ -1,4 +1,4 @@
-import pygame, math
+import pygame, math, os
 #X = block, P = player, C = checkpoint E = end empty layer: "                    "
 CONST_screenWidth = 1920
 CONST_screenHeight = 1080
@@ -13,7 +13,7 @@ deathHeight = 16 * tileSize
 
 pWidth, pHeight = 40, 80
 pAnimationFrames = ["walking1", "walking2", "walking3", "walking4", "flyingup", "flyingdown"]
-tileSpriteCount = 51
+tileSpriteCount = 71
 
 playerColor = (0, 0, 255)
 backgroundColor = (141, 214, 202)
@@ -24,6 +24,14 @@ endColor = (0, 255, 0)
 gamemode = 0
 tileSprites = []
 font = None
+
+levels = []
+
+# Appends to the array above all level files.
+for obj in os.scandir("Assets/Levels"):
+    if obj.is_file():
+        levels.insert(0, obj.name)
+print("LEVELS: " + str(levels))
 
 def setGamemode(int):
     global gamemode

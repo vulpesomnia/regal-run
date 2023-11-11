@@ -21,10 +21,10 @@ for i in range(1, settings.tileSpriteCount+1):
     temp = pygame.image.load("./Assets/Sprites/Tiles/tile" + str(i) + ".png").convert_alpha()
     settings.tileSprites.append(temp)
 
-level = Level("test", screen)
+level = Level(settings.levels[levelCount], screen)
 level.loadLevel_squared()
 
-fixedTimeStep = 1.0 / 45.0 #60fps timestep
+fixedTimeStep = 1.0 / 45.0 #fps timestep
 accumulatedTime = 0
 currentTime = pygame.time.get_ticks()
 
@@ -36,20 +36,27 @@ while True:
     newTime = pygame.time.get_ticks()
     frameTime = (newTime - currentTime) / 1000.0  
     currentTime = newTime
+
     accumulatedTime += frameTime# Accumulate it into a variable
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:#disables pygame and system libraries on program exit
+        #disables pygame and system libraries on program exit
+        if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        elif settings.gamemode == 1:#Check if clicked and if gamemode is editing mode
+
+        #Check if clicked and if gamemode is editing mode
+        elif settings.gamemode == 1:
             if event.type == pygame.MOUSEBUTTONUP:
 
                 #Get second coordinate and stop showing preview
                 selCords = level.editor.selectionCoordinates
 
                 pos = pygame.mouse.get_pos()
-                x, y = settings.screenToWorldSpace(level, pos[0], pos[1])#get world coordinate of tile at clicked coordinate
+
+                #get world coordinate of tile at clicked coordinate
+                x, y = settings.screenToWorldSpace(level, pos[0], pos[1])
+
                 if pos[1] > settings.screenHeight-200:
                     level.editor.onClick(pos[0], pos[1], event.button)
                 elif event.button == 1:
@@ -57,6 +64,7 @@ while True:
                 elif event.button == 3:
                     level.editor.removeTile(level, (selCords[0], selCords[1]), (x, y))
                 level.editor.selectionCoordinates = None
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
 
 
@@ -77,14 +85,16 @@ while True:
 
 
     #Gameplay
-    if accumulatedTime >= fixedTimeStep:#If accumulated time is say twice the amount of the fixed time step then run gameplay twice so it catches up (spiral of death factor can occur perhaps? dunno)
-        #print("Accumulated Time:" + str(accumulatedTime))
+
+    #If accumulated time is say twice the amount of the fixed time step then run gameplay twice so it catches up (spiral of death factor can occur perhaps? dunno)
+    if accumulatedTime >= fixedTimeStep:
         if level.reset == 0:#Wont reset
             level.tick()
         else:
-            if level.reset == 2:#End of level else is just death without checkpoint aka resets whole level
+            #End of level else is just death without checkpoint aka resets whole level
+            if level.reset == 2:
                 levelCount += 1
-            level = Level("test", screen)
+            level = Level(settings.levels[levelCount], screen)
             level.loadLevel_squared()
         accumulatedTime -= fixedTimeStep
 

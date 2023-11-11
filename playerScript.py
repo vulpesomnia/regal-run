@@ -15,7 +15,7 @@ class Player(pygame.sprite.Sprite):
 
         self.velocity = Vector2(0, 0)
         #self.onGround = False
-        self.jumpStrength = 23
+        self.jumpStrength = 25
         self.speed = 13
         self.gravity = 1.7
         self.jumpFrames = 0
@@ -66,6 +66,12 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animationFrames[image]
         if self.isFlipped == True:
             self.image = pygame.transform.flip(self.image, True, False)
+
+    def render(self, frame, camera):
+        camOffsetX = self.rect.x - camera.x - self.image.get_width() / 2 + 25
+        camOffsetY = self.rect.y - camera.y - self.image.get_height() / 2 + 12
+        frame.blit(self.image, (camOffsetX-settings.pWidth/4, camOffsetY))
+        
 
     def animationTick(self):
         if self.jumpFrames > 0:
