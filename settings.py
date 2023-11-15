@@ -13,7 +13,7 @@ deathHeight = 16 * tileSize
 
 pWidth, pHeight = 40, 80
 pAnimationFrames = ["walking1", "walking2", "walking3", "walking4", "flyingup", "flyingdown"]
-tileSpriteCount = 71
+tileSpriteCount = 72
 
 playerColor = (0, 0, 255)
 backgroundColor = (141, 214, 202)

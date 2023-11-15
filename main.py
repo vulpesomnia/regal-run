@@ -22,7 +22,7 @@ for i in range(1, settings.tileSpriteCount+1):
     settings.tileSprites.append(temp)
 
 level = Level(settings.levels[levelCount], screen)
-level.loadLevel_squared()
+#level.loadLevel_squared()
 
 fixedTimeStep = 1.0 / 45.0 #fps timestep
 accumulatedTime = 0
@@ -95,7 +95,7 @@ while True:
             if level.reset == 2:
                 levelCount += 1
             level = Level(settings.levels[levelCount], screen)
-            level.loadLevel_squared()
+           # level.loadLevel_squared()
         accumulatedTime -= fixedTimeStep
 
 

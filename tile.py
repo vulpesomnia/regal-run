@@ -1,5 +1,4 @@
-import pygame
-import settings
+import pygame, settings
 
 #tileColors = (groundColor, checkpointColor, endColor)
 
@@ -18,3 +17,7 @@ class Tile(pygame.sprite.Sprite):#Tileids: 0 = collision tile, 1 = no collision,
         else:
             self.image.fill((255, 0, 0))
         self.rect = self.image.get_rect(topleft = (x, y))
+        if self.imageID == 72:
+            self.collider = pygame.Rect((x, y + settings.tileSize * 0.69), (settings.tileSize, settings.tileSize * 0.31))
+        else:
+            self.collider = self.image.get_rect(topleft = (x, y))

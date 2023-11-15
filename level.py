@@ -16,6 +16,7 @@ class Level:
         self.doRender = True
         self.editor = Editor(200)
         settings.setGamemode(0)
+        self.loadLevel_squared()
 
     def loadLevel_squared(self):#TODO: create layer flag for different layers
         self.tiles = {0 : pygame.sprite.Group()}
@@ -203,12 +204,12 @@ class Level:
         if settings.gamemode == 0:
             for layerID, layer in self.tiles.items():
                 for tile in layer.sprites():
-                    if tile.rect.colliderect(player.rect):
+                    if tile.collider.colliderect(player.rect):
                         if tile.tileID == 0:
                             if player.velocity.x < 0:
-                                player.rect.left = tile.rect.right
+                                player.rect.left = tile.collider.right
                             elif player.velocity.x > 0:
-                                player.rect.right = tile.rect.left
+                                player.rect.right = tile.collider.left
                         else:
                             self.generalCollision(tile)
         self.verticalMovementCollision()
@@ -219,20 +220,20 @@ class Level:
             onGround = False
             for layerID, layer in self.tiles.items():
                 for tile in layer.sprites():
-                    if tile.rect.colliderect(player.rect):
+                    if tile.collider.colliderect(player.rect):
                         if tile.tileID == 0:
                             if player.velocity.y < 0:
-                                player.rect.bottom = tile.rect.top
+                                player.rect.bottom = tile.collider.top
                                 player.velocity.y = 0
                                 onGround = True
                             elif player.velocity.y > 0:
-                                player.rect.top = tile.rect.bottom
+                                player.rect.top = tile.collider.bottom
                                 player.velocity.y = 0
                         else:
                             self.generalCollision(tile)
             if onGround == True:
                 player.jumpFrames = 4
-            if self.player.sprite.rect.y > settings.deathHeight:
+            if player.rect.y > settings.deathHeight:
                 self.resetLevel()
         else: 
             if player.velocity.y != -player.gravity:
