@@ -4,7 +4,7 @@ from playerScript import Player
 from camera import Camera
 import settings
 from editor import Editor
-import pygame
+import pygame, parallax
 
 class Level:
 
@@ -16,6 +16,15 @@ class Level:
         self.doRender = True
         self.editor = Editor(200)
         settings.setGamemode(0)
+
+        self.parallaxObjects = []
+
+        parallaxImages = {"sky": 0.9, "mountains": 0.5, "trees": 0.2}
+        for name, parallaxValue in parallaxImages.items():
+            temp = pygame.image.load("./Assets/Sprites/parallax-" + name + ".png").convert_alpha()
+            temp = pygame.transform.scale(temp, (settings.screenWidth, settings.screenHeight))
+            self.parallaxObjects.append(parallax.parallaxObject(parallaxValue, temp))
+
         self.loadLevel_squared()
 
     def loadLevel_squared(self):#TODO: create layer flag for different layers
@@ -48,7 +57,8 @@ class Level:
 
         playerSprite = Player(settings.screenWidth + settings.tileSize/2 - settings.pWidth/2, settings.screenHeight)
         self.player.add(playerSprite)
-        self.camera = Camera(settings.screenWidth, settings.screenHeight, self.player)
+        player = self.player.sprite#made camera's 0-point at player
+        self.camera = Camera(player.rect.x, player.rect.y, self.player)
 
     def saveLevel_squared(self):
 
@@ -177,10 +187,16 @@ class Level:
     def render(self, frame):
         frame.fill(settings.backgroundColor)
         self.camera.updatePosition()
+        player = self.player.sprite
+        
+        for object in self.parallaxObjects:
+            object.update(frame, self.camera)
+        #print("Player x-coordinate: " + str(player.rect.x) + " Camera x-coordinate: " + str(self.camera.getPosition()[0] + settings.screenWidth))
+
+
         renderPlayer = True
         for layerID, layer in self.tiles.items():
             if (layerID == 1) and (settings.gamemode == 0):
-                player = self.player.sprite
                 player.render(frame, self.camera)
                 renderPlayer = False
             for tile in layer.sprites():
@@ -188,11 +204,10 @@ class Level:
                 camOffsetY = tile.rect.y - self.camera.y
                 frame.blit(tile.image, (camOffsetX, camOffsetY))
         if renderPlayer == True:
-            player = self.player.sprite
             player.render(frame, self.camera)
 
         
-        if settings.gamemode == 1:
+        if settings.gamemode == 1:#Draw editor if in editor mode
             self.editor.draw(frame)
         self.screen.blit(pygame.transform.scale(frame, (settings.screenWidth, settings.screenHeight)), (0, 0))
         self.doRender = True

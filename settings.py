@@ -27,6 +27,7 @@ font = None
 
 levels = []
 
+
 # Appends to the array above all level files.
 for obj in os.scandir("Assets/Levels"):
     if obj.is_file():

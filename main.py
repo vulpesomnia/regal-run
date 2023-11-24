@@ -21,12 +21,15 @@ for i in range(1, settings.tileSpriteCount+1):
     temp = pygame.image.load("./Assets/Sprites/Tiles/tile" + str(i) + ".png").convert_alpha()
     settings.tileSprites.append(temp)
 
+
 level = Level(settings.levels[levelCount], screen)
 #level.loadLevel_squared()
 
 fixedTimeStep = 1.0 / 45.0 #fps timestep
 accumulatedTime = 0
 currentTime = pygame.time.get_ticks()
+
+
 
 
 

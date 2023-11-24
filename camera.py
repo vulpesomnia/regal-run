@@ -11,3 +11,5 @@ class Camera:
         newY = self.y * 0.75 + (player.rect.y - settings.CONST_screenHeight / 2) * 0.25
         self.x, self.y = newX, newY
 
+    def getPosition(self):
+        return (self.x - settings.CONST_screenWidth/2, self.y - settings.CONST_screenHeight/2)
