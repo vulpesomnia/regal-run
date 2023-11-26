@@ -14,7 +14,7 @@ class parallaxObject:
 
     def update(self, frame, camera):
         cameraPos = camera.getPosition()
-        cameraYOffset = -cameraPos[1] * 0.1 - 100
+        cameraYOffset = -cameraPos[1] * 0.1 - 150
         parallaxOffset = self.image.get_width()
 
 
