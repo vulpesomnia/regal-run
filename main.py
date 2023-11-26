@@ -1,10 +1,14 @@
-import pygame
-import sys
-import math
+'''
+Contains game loop, fps handling, rendering and level to level loading.
+Running this file starts the game.
+
+NOTE: Most important files are level.py, settings.py and this file.
+'''
+
+import pygame, sys, settings
 from pygame.locals import *
 
 from level import Level
-import settings
 
 pygame.init()
 settings.initializeFont()
@@ -15,7 +19,7 @@ renderingFrame = pygame.Surface((settings.CONST_screenWidth, settings.CONST_scre
 
 levelCount = 0
 
-pygame.display.set_caption("Platformer Game")
+pygame.display.set_caption("Python Platformer")
 
 for i in range(1, settings.tileSpriteCount+1):
     temp = pygame.image.load("./Assets/Sprites/Tiles/tile" + str(i) + ".png").convert_alpha()
@@ -23,9 +27,9 @@ for i in range(1, settings.tileSpriteCount+1):
 
 
 level = Level(settings.levels[levelCount], screen)
-#level.loadLevel_squared()
 
-fixedTimeStep = 1.0 / 45.0 #fps timestep
+#Time Variables
+fixedTimeStep = 1.0 / 45.0
 accumulatedTime = 0
 currentTime = pygame.time.get_ticks()
 
@@ -73,7 +77,9 @@ while True:
 
                 #Get first coordinate and ##also if statement to render preview##
                 pos = pygame.mouse.get_pos()
-                x, y = settings.screenToWorldSpace(level, pos[0], pos[1])#get world coordinate of tile at clicked coordinate
+
+                #Get world coordinate of tile at clicked coordinate
+                x, y = settings.screenToWorldSpace(level, pos[0], pos[1])
 
                 level.editor.selectionCoordinates = (x, y)
         
@@ -98,7 +104,6 @@ while True:
             if level.reset == 2:
                 levelCount += 1
             level = Level(settings.levels[levelCount], screen)
-           # level.loadLevel_squared()
         accumulatedTime -= fixedTimeStep
 
 

@@ -1,8 +1,17 @@
+'''
+Tile class is contained in this file.
+
+TileIDs:
+ 0 : Collision
+ 1 : Death
+ 2 : Checkpoint
+ 3 : Endpoint
+ 4 : No Collision
+'''
+
 import pygame, settings
 
-#tileColors = (groundColor, checkpointColor, endColor)
-
-class Tile(pygame.sprite.Sprite):#Tileids: 0 = collision tile, 1 = no collision, 2 = death, 3 = checkpoint, 4 = end point
+class Tile(pygame.sprite.Sprite):
     def __init__(self, x, y, size, tileID, imageID, layer):
         super().__init__()
         self.x = int((x - settings.screenWidth) / settings.tileSize * -1)

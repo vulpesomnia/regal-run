@@ -1,9 +1,16 @@
+'''
+Contains editor class.
+
+Contains button input, editor rendering, editor instantiation and tile modification.
+'''
+
 import pygame, settings, math
 from button import Button
 from tile import Tile
 
 colCount = 28
-buttonSize = 48 #Cubic
+#Corresponds to width and height of button.
+buttonSize = 48
 
 class Editor:
 

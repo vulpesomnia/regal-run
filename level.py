@@ -1,10 +1,16 @@
 
+'''
+Contains most of the logic for the game.
+Handles the level saving and loading, player collision, rendering, and level logic.
+
+Main game loop is in main.py.
+'''
+
 from tile import Tile
 from playerScript import Player
 from camera import Camera
-import settings
 from editor import Editor
-import pygame, parallax
+import pygame, parallax, settings
 
 class Level:
 
@@ -19,10 +25,10 @@ class Level:
 
         self.parallaxObjects = []
 
-        parallaxImages = {"sky": 0.9, "mountains": 0.5, "trees": 0.2}
+        parallaxImages = {"sky": 0.9, "mountains": 0.75, "trees": 0.5}
         for name, parallaxValue in parallaxImages.items():
             temp = pygame.image.load("./Assets/Sprites/parallax-" + name + ".png").convert_alpha()
-            temp = pygame.transform.scale(temp, (settings.screenWidth, settings.screenHeight))
+            temp = pygame.transform.scale(temp, (settings.screenWidth * 1.25, settings.screenHeight * 1.25))
             self.parallaxObjects.append(parallax.parallaxObject(parallaxValue, temp))
 
         self.loadLevel_squared()

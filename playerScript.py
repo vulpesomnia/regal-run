@@ -1,6 +1,13 @@
-import pygame
+'''
+This file contains the code for the player.
+
+Movement, input, animations and rendering are handled here.
+Collision is in level.py.
+'''
+
+import pygame, settings
 from vector import Vector2
-import settings
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):

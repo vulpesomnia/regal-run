@@ -1,10 +1,16 @@
+'''
+Contains global variables and settings for the game.
+Also contains global functions.
+'''
+
 import pygame, math, os
-#X = block, P = player, C = checkpoint E = end empty layer: "                    "
+
+
 CONST_screenWidth = 1920
 CONST_screenHeight = 1080
 
 
-#ratio = ~1.78(1.777)
+#Ratio = ~1.78(1.777)
 screenWidth = 1920#1200
 screenHeight = 1080#675
 
@@ -16,7 +22,7 @@ pAnimationFrames = ["walking1", "walking2", "walking3", "walking4", "flyingup", 
 tileSpriteCount = 72
 
 playerColor = (0, 0, 255)
-backgroundColor = (141, 214, 202)
+backgroundColor = (50, 161, 231)
 groundColor = (255, 0, 0)
 checkpointColor = (255, 255, 0)
 endColor = (0, 255, 0)
@@ -54,11 +60,9 @@ def worldToScreenSpace(x, y):
     y = screenHeight - y * tileSize
     return (x, y)
     
-def screenToWorldSpace(level, x, y):#x + camera offset for world coordinates - screenwidth for 0, 0 to be at player spawn point divided by tilesize and floored to get x of a tile
+#x + camera offset for world coordinates - screenwidth for 0, 0 to be at player spawn point divided by tilesize and floored to get x of a tile
+def screenToWorldSpace(level, x, y):
     x = math.floor((x+level.camera.x - screenWidth)/tileSize) * -1
     y = math.floor((y+level.camera.y - screenHeight)/tileSize) * -1
     return (x, y)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -#
-
-
-#load all images

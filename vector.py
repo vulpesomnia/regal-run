@@ -1,4 +1,7 @@
+#TODO: check if this is really required. Pygame has a vector class.
+
 import pygame, math
+
 class Vector2:
     def __init__(self, x, y):
         self.x = x

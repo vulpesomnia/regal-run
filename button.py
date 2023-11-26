@@ -1,5 +1,10 @@
-import pygame, settings
+'''
+Contains Button class for editor.
 
+Button input is handled in editor.py.
+'''
+
+import settings
 
 class Button:
     def __init__(self, x, y, id, image = None):

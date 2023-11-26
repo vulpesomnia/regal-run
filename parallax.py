@@ -1,5 +1,10 @@
+'''
+Parallax system that uses 3 reoccuring images stacked next to eachother.
+If you go to the middle of any of the 2 side images it will readjust it
+so that the middle image is at your location. This creates a smooth parallax effect.
+'''
+
 import settings
-import pygame
 
 class parallaxObject:
     def __init__(self, parallaxValue, image):
@@ -9,37 +14,23 @@ class parallaxObject:
 
     def update(self, frame, camera):
         cameraPos = camera.getPosition()
-        cameraYOffset = -camera.y * 0.1 + settings.screenHeight * 0.05
-       # travel = self.startX - cameraPos[0]
+        cameraYOffset = -cameraPos[1] * 0.1 - 100
+        parallaxOffset = self.image.get_width()
 
-       # self.x = self.startX - travel * self.parallaxValue
-       # red_box = pygame.Surface((50, 50))
-        #red_box.fill((255, 0, 0))   
+
         travel = (cameraPos[0] + settings.screenWidth) - self.startX
 
         self.x = self.startX + travel * self.parallaxValue
         distance = abs((cameraPos[0] + settings.screenWidth) - self.x)
-        #print("Anchor: " + str(self.startX) + " Normal x: " + str(self.x))
-        #print(str(distance))
-        #if self.parallaxValue == 0.2:
-            #print(str(distance))
-        if distance > settings.screenWidth:
-           # print("RESET: " + str(distance))
+        if distance > parallaxOffset:
             self.startX = cameraPos[0] + settings.screenWidth
 
-
-        #The offsets are a bit weird but it works ig
-        frame.blit(self.image, (self.x - settings.screenWidth - cameraPos[0], cameraYOffset))
+        #For some reason the 2nd blit's position is to the left of the player and not at the player, might be cause were not using camera's world coordinates.
+        frame.blit(self.image, (self.x - parallaxOffset - cameraPos[0], cameraYOffset))
         frame.blit(self.image, (self.x - cameraPos[0], cameraYOffset))
-        frame.blit(self.image, (self.x - settings.screenWidth * 2 - cameraPos[0], cameraYOffset))
-        #if self.parallaxValue == 0.2:
-            #frame.blit(red_box, (self.startX - settings.screenWidth/2 - cameraPos[0], settings.screenHeight/2))
-            #frame.blit(red_box, (self.startX - cameraPos[0], settings.screenHeight/2))
-            #frame.blit(red_box, (self.startX + settings.screenWidth/2 - cameraPos[0], settings.screenHeight/2))
+        frame.blit(self.image, (self.x - parallaxOffset * 2 - cameraPos[0], cameraYOffset))
 
-
-        #NOTE: origin + (travel * parallax)
-        #camera coordinate in world coordinates: self.camera.getPosition()[0] + settings.screenWidth
+        #NOTE: Camera coordinate in world coordinates: (self.camera.getPosition()[0] + settings.screenWidth) same thing with y just opposite axis
         
 
 

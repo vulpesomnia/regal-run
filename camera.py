@@ -1,4 +1,13 @@
+'''
+This file contains the camera system for the game.
+
+The camera follows the player each frame by interpolating to the player's location.
+Then all rendered objects are offset by the camera's location. This creates the illusion that the screen
+is following the player. In conclusion all objects are just dragged to the screen with the player in the middle.
+'''
+
 import settings
+
 class Camera:
 
     def __init__(self, x, y, player):
