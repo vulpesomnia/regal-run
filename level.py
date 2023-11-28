@@ -1,4 +1,3 @@
-
 '''
 Contains most of the logic for the game.
 Handles the level saving and loading, player collision, rendering, and level logic.
@@ -6,11 +5,14 @@ Handles the level saving and loading, player collision, rendering, and level log
 Main game loop is in main.py.
 '''
 
+#TODO:
+#Create cool death animation for player. No need to reset level on death, just tp back to checkpoint.
+
 from tile import Tile
 from playerScript import Player
 from camera import Camera
 from editor import Editor
-import pygame, parallax, settings
+import pygame, parallax, settings, math
 
 class Level:
 
@@ -18,20 +20,28 @@ class Level:
         self.name = name
         self.screen = screen
         self.player = pygame.sprite.GroupSingle()
-        self.reset = 0
+        self.reset = False
         self.doRender = True
         self.editor = Editor(200)
+        self.blackFade = pygame.Surface((settings.screenWidth, settings.screenHeight), pygame.SRCALPHA)
+        self.blackFade.fill((0, 0, 0))
+        self.blackFade.set_alpha(255)
+        settings.currentLevel = self
+
+        self.alphaIncrement = 0
+
         settings.setGamemode(0)
 
         self.parallaxObjects = []
 
-        parallaxImages = {"sky": 0.9, "mountains": 0.75, "trees": 0.5}
+        parallaxImages = {"sky": 0.9, "mountains": 0.8, "trees": 0.4}
         for name, parallaxValue in parallaxImages.items():
             temp = pygame.image.load("./Assets/Sprites/parallax-" + name + ".png").convert_alpha()
             temp = pygame.transform.scale(temp, (settings.screenWidth * 1.25, settings.screenHeight * 1.25))
             self.parallaxObjects.append(parallax.parallaxObject(parallaxValue, temp))
 
         self.loadLevel_squared()
+        self.fadeOut()
 
     def loadLevel_squared(self):#TODO: create layer flag for different layers
         self.tiles = {0 : pygame.sprite.Group()}
@@ -63,7 +73,9 @@ class Level:
 
         playerSprite = Player(settings.screenWidth + settings.tileSize/2 - settings.pWidth/2, settings.screenHeight)
         self.player.add(playerSprite)
+
         player = self.player.sprite#made camera's 0-point at player
+        player.checkpoint = (player.rect.x, player.rect.y + settings.checkpointOffset)
         self.camera = Camera(player.rect.x, player.rect.y, self.player)
 
     def saveLevel_squared(self):
@@ -169,17 +181,19 @@ class Level:
             
 
     
-    def resetLevel(self):
+    def playerDeath(self):
+
         player = self.player.sprite
-        if player.checkpoint != None:
-            player.rect.x = player.checkpoint[0]
-            player.rect.y = player.checkpoint[1]
-        else:
-            self.reset = 1
+        player.isDead = 1
+        pygame.mixer.Sound.play(player.explosionSound)
+        player.animationTicks = 0
+        player.velocity.x, player.velocity.y = 0, -10
                 
     def tick(self):
         self.player.update()
-        self.horizontalMovementCollision()
+        if self.player.sprite.isDead == 0:
+            self.horizontalMovementCollision()
+        self.fadeTick()
 
     def toggleEditor(self):
         player = self.player.sprite
@@ -197,7 +211,6 @@ class Level:
         
         for object in self.parallaxObjects:
             object.update(frame, self.camera)
-        #print("Player x-coordinate: " + str(player.rect.x) + " Camera x-coordinate: " + str(self.camera.getPosition()[0] + settings.screenWidth))
 
 
         renderPlayer = True
@@ -208,19 +221,42 @@ class Level:
             for tile in layer.sprites():
                 camOffsetX = tile.rect.x - self.camera.x
                 camOffsetY = tile.rect.y - self.camera.y
-                frame.blit(tile.image, (camOffsetX, camOffsetY))
+                tileImage = tile.image
+
+                #Opacity rendering for when player is behind a bush etc.
+                if (tile.layer > 0) and (tile.tileID == 5):
+                    if player.isHidden == True:
+                        distance = math.dist((tile.rect.x, tile.rect.y), (player.rect.x, player.rect.y))
+                        if distance < 256:
+                            tileImage.set_alpha(distance)
+                        else:
+                            tileImage.set_alpha(255)
+                    elif settings.gamemode == 1:
+                        tileImage.set_alpha(128)
+                    else:
+                        tileImage.set_alpha(255)
+
+                frame.blit(tileImage, (camOffsetX, camOffsetY))
         if renderPlayer == True:
             player.render(frame, self.camera)
 
         
         if settings.gamemode == 1:#Draw editor if in editor mode
             self.editor.draw(frame)
+
+
+        #change to function then add to tick
+        
+            
+        frame.blit(self.blackFade, (0, 0))
+
         self.screen.blit(pygame.transform.scale(frame, (settings.screenWidth, settings.screenHeight)), (0, 0))
         self.doRender = True
 
 
     def horizontalMovementCollision(self):
         player = self.player.sprite
+        player.isHidden = False
         player.rect.x += player.velocity.x * player.speed
         if settings.gamemode == 0:
             for layerID, layer in self.tiles.items():
@@ -255,7 +291,7 @@ class Level:
             if onGround == True:
                 player.jumpFrames = 4
             if player.rect.y > settings.deathHeight:
-                self.resetLevel()
+                self.playerDeath()
         else: 
             if player.velocity.y != -player.gravity:
                 player.rect.y -= player.velocity.y
@@ -263,12 +299,47 @@ class Level:
             onGround = True
 
     def generalCollision(self, tile):
-        if tile.tileID == 2:
-            self.player.sprite.checkpoint = (tile.rect.x + tile.rect.width / 2 - self.player.sprite.rect.width / 2, tile.rect.y)
-        elif tile.tileID == 3:
-            self.reset = 2
-        elif tile.tileID == 1:
-            self.resetLevel()
+        player = self.player.sprite
+        if tile.tileID == 2:#Set checkpoint
+            player.checkpoint = (tile.rect.x + tile.rect.width / 2 - player.rect.width / 2, tile.rect.y + settings.checkpointOffset)
+        elif tile.tileID == 3:#next level
+            self.fadeIn()
+            self.reset = True
+        elif tile.tileID == 1:#Death
+            self.playerDeath()
+        elif (tile.tileID == 5) and (tile.layer > 0):#Behind bush, opacity increase
+            player.isHidden = True
+
+    
+    def fadeIn(self):
+        self.alphaIncrement = 15
+    
+    def fadeOut(self):
+        self.alphaIncrement = -15
+
+    def fadeTick(self):
+        player = self.player.sprite
+        if self.alphaIncrement != 0:
+            alpha = self.blackFade.get_alpha()
+            alpha += self.alphaIncrement
+            self.blackFade.set_alpha(alpha)
+            if (alpha >= 255) or (alpha <= 0):
+                self.alphaIncrement = 0
+                if player.isDead == 2:
+                    player.rect.x = player.checkpoint[0]
+                    player.rect.y = player.checkpoint[1]
+                    self.camera.x, self.camera.y = player.rect.x - settings.CONST_screenWidth/2, player.rect.y - settings.CONST_screenHeight/2 - 15
+                    player.isDead = 3
+                    self.fadeOut()
+                elif player.isDead == 3:
+                    player.isDead = 0
+
+
+
+
+    
+    
+        
 
 
 

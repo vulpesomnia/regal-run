@@ -12,6 +12,7 @@ from vector import Vector2
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
+        
         self.animationFrames = {}
         for frame in settings.pAnimationFrames:
             temp = pygame.image.load("./Assets/Sprites/" + frame + ".png").convert_alpha()
@@ -20,14 +21,20 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animationFrames["walking1"]
         self.rect = pygame.Rect((x, y), (settings.pWidth, settings.pHeight))
 
+        self.isHidden = False
+        self.isDead = 0
+
         self.velocity = Vector2(0, 0)
-        #self.onGround = False
+        
+
+
         self.jumpStrength = 25
         self.speed = 13
         self.gravity = 1.7
         self.jumpFrames = 0
         self.checkpoint = None
         self.jumpSound = pygame.mixer.Sound("./Assets/Sounds/jump.wav")
+        self.explosionSound = pygame.mixer.Sound("./Assets/Sounds/explosion.wav")
 
         self.isFlipped = False
 
@@ -61,12 +68,13 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.flip(self.image, True, False)
 
     def update(self):
-        self.getInput()
-        self.velocity.y -= self.gravity #Gravity of player
-        if settings.gamemode == 1:
-            self.jumpFrames = 4
-        else:
-            self.jumpFrames = max(0, self.jumpFrames - 1)
+        if self.isDead == 0:
+            self.getInput()
+            self.velocity.y -= self.gravity #Gravity of player
+            if settings.gamemode == 1:
+                self.jumpFrames = 4
+            else:
+                self.jumpFrames = max(0, self.jumpFrames - 1)
         self.animationTick()
 
     def updateImage(self, image):
@@ -81,31 +89,62 @@ class Player(pygame.sprite.Sprite):
         
 
     def animationTick(self):
-        if self.jumpFrames > 0:
-            if self.velocity.x == 0:
-                #idle animation
-                self.updateImage("walking1")
-            else:
-                #walking animation
-                if self.animationTicks <= 7:
-                    self.animationTicks += 1
+        if self.isDead == 0:
+            if self.jumpFrames > 0:
+                if self.velocity.x == 0:
+                    #idle animation
                     self.updateImage("walking1")
-                elif self.animationTicks <= 15:
-                    self.animationTicks += 1
-                    self.updateImage("walking2")
-                elif self.animationTicks <= 22:
-                    self.animationTicks += 1
-                    self.updateImage("walking3")
-                elif self.animationTicks <= 30:
-                    self.animationTicks += 1
-                    self.updateImage("walking4")
                 else:
-                    self.animationTicks = 0
-                
-        else:
-            if self.velocity.y > 0:
-                #flying upwards animation
-                self.updateImage("flyingup")
+                    #walking animation
+                    if self.animationTicks <= 7:
+                        self.animationTicks += 1
+                        self.updateImage("walking1")
+                    elif self.animationTicks <= 15:
+                        self.animationTicks += 1
+                        self.updateImage("walking2")
+                    elif self.animationTicks <= 22:
+                        self.animationTicks += 1
+                        self.updateImage("walking3")
+                    elif self.animationTicks <= 30:
+                        self.animationTicks += 1
+                        self.updateImage("walking4")
+                    else:
+                        self.animationTicks = 0
+                    
             else:
-                #flying downwards animation
-                self.updateImage("flyingdown")
+                if self.velocity.y > 0:
+                    #flying upwards animation
+                    self.updateImage("flyingup")
+                else:
+                    #flying downwards animation
+                    self.updateImage("flyingdown")
+
+        elif self.isDead == 1:
+            if self.animationTicks <= 1:
+                self.updateImage("death1")
+            elif self.animationTicks <= 2:
+                self.updateImage("death2")
+            elif self.animationTicks <= 3:
+                self.updateImage("death3")
+            elif self.animationTicks <= 4:
+                self.updateImage("death4")
+            elif self.animationTicks <= 5:
+                self.updateImage("death5")
+            elif self.animationTicks <= 6:
+                self.updateImage("death6")
+            elif self.animationTicks <= 7:
+                self.updateImage("death7")
+            elif self.animationTicks <= 8:
+                self.updateImage("death8")
+            elif self.animationTicks <= 9:
+                self.updateImage("death9")
+            elif self.animationTicks <= 10:
+                self.updateImage("death10")
+            elif self.animationTicks <= 11:
+                self.updateImage("death11")
+            elif self.animationTicks <= 12:
+                self.updateImage("death12")
+            elif self.animationTicks >= 16:
+                self.isDead = 2
+                settings.currentLevel.fadeIn()
+            self.animationTicks += 1

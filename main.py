@@ -36,7 +36,6 @@ currentTime = pygame.time.get_ticks()
 
 
 
-
 # Main game loop
 while True:
     #Get difference of time between last frame and current frame
@@ -97,13 +96,11 @@ while True:
 
     #If accumulated time is say twice the amount of the fixed time step then run gameplay twice so it catches up (spiral of death factor can occur perhaps? dunno)
     if accumulatedTime >= fixedTimeStep:
-        if level.reset == 0:#Wont reset
-            level.tick()
-        else:
-            #End of level else is just death without checkpoint aka resets whole level
-            if level.reset == 2:
+        level.tick()
+        if level.reset == True:
+            if level.alphaIncrement == 0:
                 levelCount += 1
-            level = Level(settings.levels[levelCount], screen)
+                level = Level(settings.levels[levelCount], screen)
         accumulatedTime -= fixedTimeStep
 
 

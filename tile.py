@@ -7,6 +7,7 @@ TileIDs:
  2 : Checkpoint
  3 : Endpoint
  4 : No Collision
+ 5 : Opacity increases when player collides (ex. bushes)
 '''
 
 import pygame, settings
