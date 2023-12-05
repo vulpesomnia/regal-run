@@ -5,9 +5,6 @@ Handles the level saving and loading, player collision, rendering, and level log
 Main game loop is in main.py.
 '''
 
-#TODO:
-#Create cool death animation for player. No need to reset level on death, just tp back to checkpoint.
-
 from tile import Tile
 from playerScript import Player
 from camera import Camera
@@ -289,7 +286,7 @@ class Level:
                         else:
                             self.generalCollision(tile)
             if onGround == True:
-                player.jumpFrames = 4
+                player.jumpFrames = player.jumpFrameMax
             if player.rect.y > settings.deathHeight:
                 self.playerDeath()
         else: 
@@ -302,9 +299,10 @@ class Level:
         player = self.player.sprite
         if tile.tileID == 2:#Set checkpoint
             player.checkpoint = (tile.rect.x + tile.rect.width / 2 - player.rect.width / 2, tile.rect.y + settings.checkpointOffset)
-        elif tile.tileID == 3:#next level
+        elif tile.tileID == 3 and self.reset == False:#next level
             self.fadeIn()
             self.reset = True
+            pygame.mixer.Sound.play(player.explosionSound)
         elif tile.tileID == 1:#Death
             self.playerDeath()
         elif (tile.tileID == 5) and (tile.layer > 0):#Behind bush, opacity increase

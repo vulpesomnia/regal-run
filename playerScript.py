@@ -32,6 +32,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 13
         self.gravity = 1.7
         self.jumpFrames = 0
+        self.jumpFrameMax = 8
         self.checkpoint = None
         self.jumpSound = pygame.mixer.Sound("./Assets/Sounds/jump.wav")
         self.explosionSound = pygame.mixer.Sound("./Assets/Sounds/explosion.wav")
@@ -43,8 +44,8 @@ class Player(pygame.sprite.Sprite):
         if self.jumpFrames > 0:
             self.velocity.y = self.jumpStrength * direction
             if (settings.gamemode == 0):
-                    self.jumpFrames = 0
-                    pygame.mixer.Sound.play(self.jumpSound)
+                self.jumpFrames = 0
+                pygame.mixer.Sound.play(self.jumpSound)
 
     def getInput(self):
         keys = pygame.key.get_pressed()
@@ -72,7 +73,7 @@ class Player(pygame.sprite.Sprite):
             self.getInput()
             self.velocity.y -= self.gravity #Gravity of player
             if settings.gamemode == 1:
-                self.jumpFrames = 4
+                self.jumpFrames = self.jumpFrameMax
             else:
                 self.jumpFrames = max(0, self.jumpFrames - 1)
         self.animationTick()
@@ -120,31 +121,9 @@ class Player(pygame.sprite.Sprite):
                     self.updateImage("flyingdown")
 
         elif self.isDead == 1:
-            if self.animationTicks <= 1:
-                self.updateImage("death1")
-            elif self.animationTicks <= 2:
-                self.updateImage("death2")
-            elif self.animationTicks <= 3:
-                self.updateImage("death3")
-            elif self.animationTicks <= 4:
-                self.updateImage("death4")
-            elif self.animationTicks <= 5:
-                self.updateImage("death5")
-            elif self.animationTicks <= 6:
-                self.updateImage("death6")
-            elif self.animationTicks <= 7:
-                self.updateImage("death7")
-            elif self.animationTicks <= 8:
-                self.updateImage("death8")
-            elif self.animationTicks <= 9:
-                self.updateImage("death9")
-            elif self.animationTicks <= 10:
-                self.updateImage("death10")
-            elif self.animationTicks <= 11:
-                self.updateImage("death11")
-            elif self.animationTicks <= 12:
-                self.updateImage("death12")
-            elif self.animationTicks >= 16:
+            if self.animationTicks >= 16:
                 self.isDead = 2
                 settings.currentLevel.fadeIn()
+            else:
+                self.updateImage("death" + str(min(self.animationTicks+1, 12)))
             self.animationTicks += 1

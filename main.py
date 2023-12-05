@@ -100,6 +100,8 @@ while True:
         if level.reset == True:
             if level.alphaIncrement == 0:
                 levelCount += 1
+                if levelCount == len(settings.levels):
+                    levelCount = 0
                 level = Level(settings.levels[levelCount], screen)
         accumulatedTime -= fixedTimeStep
 
