@@ -42,7 +42,8 @@ levels = []
 # Appends to the array above all level files.
 for obj in os.scandir("Assets/Levels"):
     if obj.is_file():
-        levels.insert(0, obj.name)
+        #levels.insert(0, obj.name)
+        levels.append(obj.name)
 print("LEVELS: " + str(levels))
 
 def setGamemode(int):

@@ -58,7 +58,17 @@ class Player(pygame.sprite.Sprite):
                 self.swapImage()
             self.velocity.x = 1
         else:
-            self.velocity.x = 0
+            #self.velocity.x = 0
+            if self.jumpFrames > 0:
+                self.velocity.x = 0
+            else:
+                if self.isFlipped == True:
+                    if self.velocity.x > -0.1:
+                        self.velocity.x = 0
+                else:
+                    if self.velocity.x < 0.1:
+                        self.velocity.x = 0
+                self.velocity.x *= 0.8
         if keys[pygame.K_SPACE]:
             self.jump(1)
         elif keys[pygame.K_LSHIFT] and settings.gamemode == 1:

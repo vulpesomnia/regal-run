@@ -9,7 +9,7 @@ from tile import Tile
 from playerScript import Player
 from camera import Camera
 from editor import Editor
-import pygame, parallax, settings, math
+import pygame, parallax, settings, math, random
 
 class Level:
 
@@ -45,6 +45,7 @@ class Level:
         levelFile = open("./Assets/Levels/" + self.name, "r")#Open file in reading mode
         tileData = []
         for rawData in levelFile:#loop through lines
+            r, g, b = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
             if rawData == "\n":
                 break
             tileData = rawData.split("|")#split data{x, y, tileID, imageID}
@@ -61,6 +62,7 @@ class Level:
                 for j in range(boundaries[2], boundaries[0]+1):#x
                     x = settings.worldToScreenSpace(j, 0)[0]
                     tile = Tile(x, y, settings.tileSize, tileData[1], tileData[2], tileData[3])
+                    tile.image.fill((r, g, b), special_flags=pygame.BLEND_RGBA_MIN)
                     layer = tileData[3]
                     if self.tiles.get(layer) is None:
                         self.tiles[layer] = pygame.sprite.Group()
