@@ -9,7 +9,7 @@ from tile import Tile
 from playerScript import Player
 from camera import Camera
 from editor import Editor
-import pygame, parallax, settings, math, random
+import pygame, parallax, settings, math
 
 class Level:
 
@@ -45,7 +45,6 @@ class Level:
         levelFile = open("./Assets/Levels/" + self.name, "r")#Open file in reading mode
         tileData = []
         for rawData in levelFile:#loop through lines
-            r, g, b = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
             if rawData == "\n":
                 break
             tileData = rawData.split("|")#split data{x, y, tileID, imageID}
@@ -62,7 +61,6 @@ class Level:
                 for j in range(boundaries[2], boundaries[0]+1):#x
                     x = settings.worldToScreenSpace(j, 0)[0]
                     tile = Tile(x, y, settings.tileSize, tileData[1], tileData[2], tileData[3])
-                    tile.image.fill((r, g, b), special_flags=pygame.BLEND_RGBA_MIN)
                     layer = tileData[3]
                     if self.tiles.get(layer) is None:
                         self.tiles[layer] = pygame.sprite.Group()
@@ -80,7 +78,9 @@ class Level:
     def saveLevel_squared(self):
 
         sortedTiles = {}#{Layer(INT) : {y-coordinate(INT) : [x-coordinates(INT)]}}, basically sorted as such: depth, col, row
-        for layerID, layer in self.tiles.items():# (Sort tiles from highest y and highest x to lowest y and lowest x)
+
+        # (Sort tiles from highest y and highest x to lowest y and lowest x)
+        for layerID, layer in self.tiles.items():
             if sortedTiles.get(layerID) == None:
                 sortedTiles[layerID] = {}
             for tile in layer.sprites():
@@ -95,6 +95,7 @@ class Level:
                             sortedTiles[layerID][tile.y].append(tile)
                             break
 
+
         keys = sortedTiles.keys()
         
         for key in keys:
@@ -102,17 +103,25 @@ class Level:
 
         squaredChunks = []#[(x,y), (x,y), tileid, imageid, layerid]
 
-
-        for layer in sortedTiles.keys():
-            while settings.dictLength(sortedTiles[layer]) != 0:#{x,y,x,y}|TileID|ImageID|LayerID
+        #Goes through all tiles in the specified layer and organizes them into chunks.
+        for layer in sortedTiles.keys():#For each layer
+            while settings.dictLength(sortedTiles[layer]) != 0:#While there are still tiles to be organized.
                 tempSquare = [(0, 0), (0, 0), 0, 0, 0]
                 tilesToRemove = []
                 currentX = 0
                 endX = 0
                 endY = 0
                 count = 0
-                for yKey, tiles in sortedTiles[layer].items():#loop through y levels
-                    for index, tile in enumerate(tiles):
+                first_yKey = 0
+                for yKey, tiles in sortedTiles[layer].items():#Goes through each y-level
+                    #print(str(yKey))
+                    #print([str(tile.y) for tile in tiles])
+                    if count == 0:
+                        first_yKey = yKey
+                    else:
+                        if (abs(yKey-endY) != 1):
+                            break
+                    for index, tile in enumerate(tiles):#Goes through all tiles.
                         count += 1
                         if count == 1:#Get first tile for chunk
                             tempSquare[0] = (tile.x, tile.y)
@@ -122,23 +131,26 @@ class Level:
                             currentX = tile.x
                             endY = yKey
                             endX = tile.x
-                        elif (tile.x == currentX-1) and ((tile.tileID == tempSquare[2]) and (tile.imageID == tempSquare[3])):#check if tile data matches chunk's data
-                                currentX = tile.x
+                        elif yKey == first_yKey:#Figure out max x with first y-layer
+                            if (tile.x == endX-1) and ((tile.tileID == tempSquare[2]) and (tile.imageID == tempSquare[3])):#check if tile data matches chunk's data
+                                endX = tile.x
                                 endY = yKey
-                        else:#if tile doesnt match chunk data
-                            if endY == yKey:#If we have atleast 1 tile in this y level then we can put the endX to the currentX
-                                endX = currentX
-                            break
-                        endX = currentX#this should work maybe?
-                    currentX = tempSquare[0][0]+1#Put currentx to x of starting tile, +1 is for the if statement to work
-                    if endY != yKey:
+                        elif ((tile.x == currentX-1) and (tile.x >= endX)) and ((tile.tileID == tempSquare[2]) and (tile.imageID == tempSquare[3])):#check if tile data matches chunk's data
+                            currentX = tile.x
+                            endY = yKey
+
+                    if (currentX != endX) and ((endY == yKey) and (first_yKey != yKey)):#If we werent able to fulfill the x requirement go back to last layer.
+                        endY += 1
                         break
+                    currentX = tempSquare[0][0]+1#Put currentx to x of starting tile (+1 is so that the check which goes 1 forward(-1 is forward for some reason) is checking under start pos)
+
 
 
 
                 tempSquare[1] = (endX, endY)
 
-                for yKey, tiles in sortedTiles[layer].items():#add tiles in chunk to be removed
+                #Remove all tiles that have been used to make this chunk from the list that we are looping through. (Prevents conflicts)
+                for yKey, tiles in sortedTiles[layer].items():
                     for tile in tiles:
                         if (tile.x <= tempSquare[0][0]) and (tile.y <= tempSquare[0][1]):#if tile x is less than
                             if (tile.x >= tempSquare[1][0]) and (tile.y >= tempSquare[1][1]):
@@ -158,6 +170,9 @@ class Level:
                 for yKey in yKeys:
                     if len(sortedTiles[layer][yKey]) == 0:
                         del sortedTiles[layer][yKey]
+
+
+
         levelFile = open("./Assets/Levels/" + self.name, "w")
         for chunk in squaredChunks:#{x,y,x,y}|TileID|ImageID|LayerID
             boundaries = []

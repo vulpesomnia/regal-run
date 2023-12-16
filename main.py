@@ -17,7 +17,7 @@ screen = pygame.display.set_mode((settings.screenWidth, settings.screenHeight))
 clock = pygame.time.Clock()
 renderingFrame = pygame.Surface((settings.CONST_screenWidth, settings.CONST_screenHeight))
 
-levelCount = 4
+levelCount = 0
 
 pygame.display.set_caption("Python Platformer")
 
