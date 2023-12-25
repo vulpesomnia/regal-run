@@ -93,9 +93,9 @@ class Player(pygame.sprite.Sprite):
         if self.isFlipped == True:
             self.image = pygame.transform.flip(self.image, True, False)
 
-    def render(self, frame, camera):
-        camOffsetX = self.rect.x - camera.x - self.image.get_width() / 2 + 25
-        camOffsetY = self.rect.y - camera.y - self.image.get_height() / 2 + 12
+    def render(self, frame, camera, frameTime):
+        camOffsetX = (self.rect.x + (self.velocity.x * self.speed * frameTime)) - camera.x - self.image.get_width() / 2 + 25
+        camOffsetY = (self.rect.y - (self.velocity.y * frameTime)) - camera.y - self.image.get_height() / 2 + 12
         frame.blit(self.image, (camOffsetX-settings.pWidth/4, camOffsetY))
         
 

@@ -18,7 +18,6 @@ class Level:
         self.screen = screen
         self.player = pygame.sprite.GroupSingle()
         self.reset = False
-        self.doRender = True
         self.editor = Editor(200)
         self.blackFade = pygame.Surface((settings.screenWidth, settings.screenHeight), pygame.SRCALPHA)
         self.blackFade.fill((0, 0, 0))
@@ -213,12 +212,12 @@ class Level:
         player = self.player.sprite
         if settings.gamemode == 0:
             settings.setGamemode(1)
-            player.speed = 18
+            player.speed += 5
         else:
             settings.setGamemode(0)
-            player.speed = 13
+            player.speed -= 5
 
-    def render(self, frame):
+    def render(self, frame, frameTime):#Frametime is an extrapolation factor for rendering
         frame.fill(settings.backgroundColor)
         self.camera.updatePosition()
         player = self.player.sprite
@@ -230,29 +229,28 @@ class Level:
         renderPlayer = True
         for layerID, layer in self.tiles.items():
             if (layerID == 1) and (settings.gamemode == 0):
-                player.render(frame, self.camera)
+                player.render(frame, self.camera, frameTime)
                 renderPlayer = False
             for tile in layer.sprites():
                 camOffsetX = tile.rect.x - self.camera.x
                 camOffsetY = tile.rect.y - self.camera.y
                 tileImage = tile.image
-
-                #Opacity rendering for when player is behind a bush etc.
-                if (tile.layer > 0) and (tile.tileID == 5):
-                    if player.isHidden == True:
-                        distance = math.dist((tile.rect.x, tile.rect.y), (player.rect.x, player.rect.y))
-                        if distance < 256:
-                            tileImage.set_alpha(distance)
+                if abs(tile.rect.x + settings.tileSize/2 - self.camera.getPosition()[0]) > (settings.screenWidth/2 - settings.tileSize/2):#rendering culling
+                    if (tile.layer > 0) and (tile.tileID == 5):
+                        if player.isHidden == True:
+                            distance = math.dist((tile.rect.x, tile.rect.y), (player.rect.x, player.rect.y))
+                            if distance < 256:
+                                tileImage.set_alpha(distance)
+                            else:
+                                tileImage.set_alpha(255)
+                        elif settings.gamemode == 1:
+                            tileImage.set_alpha(128)
                         else:
                             tileImage.set_alpha(255)
-                    elif settings.gamemode == 1:
-                        tileImage.set_alpha(128)
-                    else:
-                        tileImage.set_alpha(255)
 
-                frame.blit(tileImage, (camOffsetX, camOffsetY))
+                    frame.blit(tileImage, (camOffsetX, camOffsetY))
         if renderPlayer == True:
-            player.render(frame, self.camera)
+            player.render(frame, self.camera, frameTime)
 
         
         if settings.gamemode == 1:#Draw editor if in editor mode
@@ -265,7 +263,6 @@ class Level:
         frame.blit(self.blackFade, (0, 0))
 
         self.screen.blit(pygame.transform.scale(frame, (settings.screenWidth, settings.screenHeight)), (0, 0))
-        self.doRender = True
 
 
     def horizontalMovementCollision(self):
@@ -273,7 +270,7 @@ class Level:
         player.isHidden = False
         player.rect.x += player.velocity.x * player.speed
         if settings.gamemode == 0:
-            for layerID, layer in self.tiles.items():
+            for layer in self.tiles.values():
                 for tile in layer.sprites():
                     if tile.collider.colliderect(player.rect):
                         if tile.tileID == 0:
@@ -289,19 +286,20 @@ class Level:
         if settings.gamemode == 0:
             player.rect.y -= player.velocity.y
             onGround = False
-            for layerID, layer in self.tiles.items():
+            for layer in self.tiles.values():
                 for tile in layer.sprites():
-                    if tile.collider.colliderect(player.rect):
-                        if tile.tileID == 0:
-                            if player.velocity.y < 0:
-                                player.rect.bottom = tile.collider.top
-                                player.velocity.y = 0
-                                onGround = True
-                            elif player.velocity.y > 0:
-                                player.rect.top = tile.collider.bottom
-                                player.velocity.y = 0
-                        else:
-                            self.generalCollision(tile)
+                    if abs(tile.rect.x - player.rect.x) < settings.tileSize * 2:#collision check culling
+                        if tile.collider.colliderect(player.rect):
+                            if tile.tileID == 0:
+                                if player.velocity.y < 0:
+                                    player.rect.bottom = tile.collider.top
+                                    player.velocity.y = 0
+                                    onGround = True
+                                elif player.velocity.y > 0:
+                                    player.rect.top = tile.collider.bottom
+                                    player.velocity.y = 0
+                            else:
+                                self.generalCollision(tile)
             if onGround == True:
                 player.jumpFrames = player.jumpFrameMax
             if player.rect.y > settings.deathHeight:

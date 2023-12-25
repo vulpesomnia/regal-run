@@ -13,7 +13,7 @@ from level import Level
 pygame.init()
 settings.initializeFont()
 
-screen = pygame.display.set_mode((settings.screenWidth, settings.screenHeight))
+screen = pygame.display.set_mode((settings.screenWidth, settings.screenHeight), pygame.DOUBLEBUF)
 clock = pygame.time.Clock()
 renderingFrame = pygame.Surface((settings.CONST_screenWidth, settings.CONST_screenHeight))
 
@@ -29,22 +29,18 @@ for i in range(1, settings.tileSpriteCount+1):
 level = Level(settings.levels[levelCount], screen)
 
 #Time Variables
-fixedTimeStep = 1.0 / 45.0
-accumulatedTime = 0
-currentTime = pygame.time.get_ticks()
 
+physicsFps = 45
+RenderingFps = 30
+
+fixedTimeStep = 1.0 / physicsFps
+accumulatedTime = 0
+lastTime = pygame.time.get_ticks()
 
 
 
 # Main game loop
 while True:
-    #Get difference of time between last frame and current frame
-    newTime = pygame.time.get_ticks()
-    frameTime = (newTime - currentTime) / 1000.0  
-    currentTime = newTime
-
-    accumulatedTime += frameTime# Accumulate it into a variable
-
     for event in pygame.event.get():
         #disables pygame and system libraries on program exit
         if event.type == pygame.QUIT:
@@ -90,27 +86,34 @@ while True:
                 elif event.key == pygame.K_v:    
                     level.saveLevel_squared()
             
+    #Get difference of time between last frame and current frame
+    currentTime = pygame.time.get_ticks()
+    elapsedTime = (currentTime - lastTime) / 1000.0  
 
+    accumulatedTime += elapsedTime# Accumulate it into a variable
 
     #Gameplay
 
-    #If accumulated time is say twice the amount of the fixed time step then run gameplay twice so it catches up (spiral of death factor can occur perhaps? dunno)
-    if accumulatedTime >= fixedTimeStep:
+    #This should be a while loop but it causes jittering i will have to look into that.
+    while accumulatedTime >= fixedTimeStep:
         level.tick()
+        accumulatedTime -= fixedTimeStep
+
+
         if level.reset == True:
             if level.alphaIncrement == 0:
                 levelCount += 1
                 if levelCount == len(settings.levels):
                     levelCount = 0
                 level = Level(settings.levels[levelCount], screen)
-        accumulatedTime -= fixedTimeStep
+
+                
 
 
-    #Double buffered rendering (kinda wonk with only pygame, maybe needs opengl support)
-    if level.doRender == True:
-        pygame.display.flip()
-        level.doRender = False
-        level.render(renderingFrame)
-    clock.tick(45)
+    #print(accumulatedTime / fixedTimeStep)
+    pygame.display.flip()
+    level.render(renderingFrame, (accumulatedTime / fixedTimeStep))
+    lastTime = currentTime
+    clock.tick(RenderingFps)
 
 
