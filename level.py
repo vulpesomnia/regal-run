@@ -202,10 +202,10 @@ class Level:
         player.animationTicks = 0
         player.velocity.x, player.velocity.y = 0, -10
                 
-    def tick(self):
+    def tick(self, frameTime):
         self.player.update()
         if self.player.sprite.isDead == 0:
-            self.horizontalMovementCollision()
+            self.horizontalMovementCollision(frameTime)
         self.fadeTick()
 
     def toggleEditor(self):
@@ -217,7 +217,7 @@ class Level:
             settings.setGamemode(0)
             player.speed -= 5
 
-    def render(self, frame, frameTime):#Frametime is an extrapolation factor for rendering
+    def render(self, frame):#Frametime is an extrapolation factor for rendering
         frame.fill(settings.backgroundColor)
         self.camera.updatePosition()
         player = self.player.sprite
@@ -229,7 +229,7 @@ class Level:
         renderPlayer = True
         for layerID, layer in self.tiles.items():
             if (layerID == 1) and (settings.gamemode == 0):
-                player.render(frame, self.camera, frameTime)
+                player.render(frame, self.camera)
                 renderPlayer = False
             for tile in layer.sprites():
                 camOffsetX = tile.rect.x - self.camera.x
@@ -250,7 +250,7 @@ class Level:
 
                     frame.blit(tileImage, (camOffsetX, camOffsetY))
         if renderPlayer == True:
-            player.render(frame, self.camera, frameTime)
+            player.render(frame, self.camera)
 
         
         if settings.gamemode == 1:#Draw editor if in editor mode
@@ -265,10 +265,10 @@ class Level:
         self.screen.blit(pygame.transform.scale(frame, (settings.screenWidth, settings.screenHeight)), (0, 0))
 
 
-    def horizontalMovementCollision(self):
+    def horizontalMovementCollision(self, frameTime):
         player = self.player.sprite
         player.isHidden = False
-        player.rect.x += player.velocity.x * player.speed
+        player.rect.x += player.velocity.x * player.speed * frameTime
         if settings.gamemode == 0:
             for layer in self.tiles.values():
                 for tile in layer.sprites():
@@ -280,11 +280,11 @@ class Level:
                                 player.rect.right = tile.collider.left
                         else:
                             self.generalCollision(tile)
-        self.verticalMovementCollision()
-    def verticalMovementCollision(self):
+        self.verticalMovementCollision(frameTime)
+    def verticalMovementCollision(self, frameTime):
         player = self.player.sprite
         if settings.gamemode == 0:
-            player.rect.y -= player.velocity.y
+            player.rect.y -= player.velocity.y * frameTime
             onGround = False
             for layer in self.tiles.values():
                 for tile in layer.sprites():

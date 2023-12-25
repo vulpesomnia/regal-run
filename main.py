@@ -96,10 +96,8 @@ while True:
 
     #This should be a while loop but it causes jittering i will have to look into that.
     while accumulatedTime >= fixedTimeStep:
-        level.tick()
+        level.tick(1)
         accumulatedTime -= fixedTimeStep
-
-
         if level.reset == True:
             if level.alphaIncrement == 0:
                 levelCount += 1
@@ -107,13 +105,18 @@ while True:
                     levelCount = 0
                 level = Level(settings.levels[levelCount], screen)
 
+    if accumulatedTime > 0:
+        level.tick(accumulatedTime / fixedTimeStep)
+        accumulatedTime = 0
+        
+
                 
 
 
-    #print(accumulatedTime / fixedTimeStep)
     pygame.display.flip()
-    level.render(renderingFrame, (accumulatedTime / fixedTimeStep))
+    level.render(renderingFrame)
     lastTime = currentTime
+    print((currentTime + fixedTimeStep - pygame.time.get_ticks()))
     clock.tick(RenderingFps)
 
 

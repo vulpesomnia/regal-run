@@ -28,8 +28,8 @@ class Player(pygame.sprite.Sprite):
         
 
 
-        self.jumpStrength = 25
-        self.speed = 13
+        self.jumpStrength = 28
+        self.speed = 15
         self.gravity = 1.7
         self.jumpFrames = 0
         self.jumpFrameMax = 8
@@ -81,7 +81,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         if self.isDead == 0:
             self.getInput()
-            self.velocity.y -= self.gravity #Gravity of player
+            self.velocity.y -= self.gravity#Gravity of player
             if settings.gamemode == 1:
                 self.jumpFrames = self.jumpFrameMax
             else:
@@ -93,9 +93,9 @@ class Player(pygame.sprite.Sprite):
         if self.isFlipped == True:
             self.image = pygame.transform.flip(self.image, True, False)
 
-    def render(self, frame, camera, frameTime):
-        camOffsetX = (self.rect.x + (self.velocity.x * self.speed * frameTime)) - camera.x - self.image.get_width() / 2 + 25
-        camOffsetY = (self.rect.y - (self.velocity.y * frameTime)) - camera.y - self.image.get_height() / 2 + 12
+    def render(self, frame, camera):
+        camOffsetX = (self.rect.x) - camera.x - self.image.get_width() / 2 + 25 # + (self.velocity.x * self.speed * frameTime)
+        camOffsetY = (self.rect.y) - camera.y - self.image.get_height() / 2 + 12 # - (self.velocity.y * frameTime)
         frame.blit(self.image, (camOffsetX-settings.pWidth/4, camOffsetY))
         
 
