@@ -1,3 +1,6 @@
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
+
+
 '''
 Contains game loop, fps handling, rendering and level to level loading.
 Running this file starts the game.
@@ -105,7 +108,7 @@ while True:
                     levelCount = 0
                 level = Level(settings.levels[levelCount], screen)
 
-    if accumulatedTime > 0:
+    if accumulatedTime > 0:#Extrapolate next frame if theres a remainder
         level.tick(accumulatedTime / fixedTimeStep)
         accumulatedTime = 0
         
@@ -116,7 +119,6 @@ while True:
     pygame.display.flip()
     level.render(renderingFrame)
     lastTime = currentTime
-    print((currentTime + fixedTimeStep - pygame.time.get_ticks()))
     clock.tick(RenderingFps)
 
 

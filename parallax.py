@@ -1,3 +1,5 @@
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
+
 '''
 Parallax system that uses 3 reoccuring images stacked next to eachother.
 If you go to the middle of any of the 2 side images it will readjust it

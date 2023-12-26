@@ -1,3 +1,5 @@
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
+
 '''
 Contains most of the logic for the game.
 Handles the level saving and loading, player collision, rendering, and level logic.

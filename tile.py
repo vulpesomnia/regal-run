@@ -1,3 +1,5 @@
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
+
 '''
 Tile class is contained in this file.
 

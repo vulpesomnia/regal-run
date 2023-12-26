@@ -1,4 +1,4 @@
-#TODO: check if this is really required. Pygame has a vector class.
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
 
 import pygame, math
 

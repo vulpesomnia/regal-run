@@ -1,3 +1,5 @@
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
+
 '''
 This file contains the camera system for the game.
 

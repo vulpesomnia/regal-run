@@ -1,3 +1,5 @@
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
+
 '''
 Contains editor class.
 

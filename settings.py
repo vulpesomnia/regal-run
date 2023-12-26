@@ -1,3 +1,6 @@
+# © 2023 Tommy Kroon <somnic.vulpes@gmail.com>
+
+
 '''
 Contains global variables and settings for the game.
 Also contains global functions.
