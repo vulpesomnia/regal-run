@@ -82,7 +82,9 @@ I will also add a few smaller sections down here for less important information.
   <summary>Credits</summary>
   <ul>
     <li>Art is from <a href="https://opengameart.org/content/a-platformer-in-the-forest">A platformer in the forest</a> by Buch with a few small additions of my own.</li>
+    <li>Sounds were made with <a href="https://sfxr.me/">jsfxr</a>.</li>
     <li>All the source code is made by me.</li>
+    
   </ul>
 </details>
 
