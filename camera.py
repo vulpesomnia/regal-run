@@ -8,7 +8,7 @@ Then all rendered objects are offset by the camera's location. This creates the 
 is following the player. In conclusion all objects are just dragged to the screen with the player in the middle.
 '''
 
-import settings, math
+import settings
 
 class Camera:
 

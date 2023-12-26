@@ -97,7 +97,6 @@ while True:
 
     #Gameplay
 
-    #This should be a while loop but it causes jittering i will have to look into that.
     while accumulatedTime >= fixedTimeStep:
         level.tick(1)
         accumulatedTime -= fixedTimeStep
