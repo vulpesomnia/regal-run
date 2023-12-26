@@ -22,7 +22,7 @@ renderingFrame = pygame.Surface((settings.CONST_screenWidth, settings.CONST_scre
 
 levelCount = 0
 
-pygame.display.set_caption("Python Platformer")
+pygame.display.set_caption("Regal Run")
 
 for i in range(1, settings.tileSpriteCount+1):
     temp = pygame.image.load("./Assets/Sprites/Tiles/tile" + str(i) + ".png").convert_alpha()
