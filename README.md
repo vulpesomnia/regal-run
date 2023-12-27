@@ -73,7 +73,11 @@ I will also add a few smaller sections down here for less important information.
 
 <details>
   <summary>Showcase</summary>
-  video coming soon
+  <ul>
+   <li>
+    <a href="https://youtu.be/TUaTfN_zZiw">Playthrough and Showcase</a>
+   </li>
+  </ul>
 </details>
 
 
