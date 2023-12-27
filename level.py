@@ -208,16 +208,18 @@ class Level:
     def tick(self, frameTime):
         self.player.update()
         if self.player.sprite.isDead == 0:
-            self.horizontalMovementCollision(frameTime)
+            self.verticalMovementCollision(frameTime)
         self.fadeTick()
 
     def toggleEditor(self):
         player = self.player.sprite
         if settings.gamemode == 0:
             settings.setGamemode(1)
+            pygame.mouse.set_visible(True)
             player.speed += 5
         else:
             settings.setGamemode(0)
+            pygame.mouse.set_visible(False)
             player.speed -= 5
 
     def render(self, frame):#Frametime is an extrapolation factor for rendering
@@ -279,7 +281,6 @@ class Level:
                                 player.rect.right = tile.collider.left
                         else:
                             self.generalCollision(tile)
-        self.verticalMovementCollision(frameTime)
     def verticalMovementCollision(self, frameTime):
         player = self.player.sprite
         if settings.gamemode == 0:
@@ -308,6 +309,7 @@ class Level:
                 player.rect.y -= player.velocity.y
             player.velocity.y = 0
             onGround = True
+        self.horizontalMovementCollision(frameTime)
 
     def generalCollision(self, tile):
         player = self.player.sprite

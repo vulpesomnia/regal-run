@@ -30,6 +30,6 @@ class Tile(pygame.sprite.Sprite):
             self.image.fill((255, 0, 0))
         self.rect = self.image.get_rect(topleft = (x, y))
         if self.imageID == 72:
-            self.collider = pygame.Rect((x, y + settings.tileSize * 0.69), (settings.tileSize, settings.tileSize * 0.31))
+            self.collider = pygame.Rect((x, y + settings.tileSize * 0.79), (settings.tileSize, settings.tileSize * 0.41))
         else:
             self.collider = self.image.get_rect(topleft = (x, y))
