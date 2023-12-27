@@ -70,11 +70,12 @@ I will also add a few smaller sections down here for less important information.
   </ol>
   <ul>
    <li>Tile IDs:
-   <ol type="1">
+   <ol type="1" start="0">
     <li>Collision</li>
     <li>Death</li>
     <li>Checkpoint</li>
     <li>Endpoint</li>
+    <li>No collision</li>
     <li>Opacity increase (ex. bushes)</li>
    </ol>
    </li>
