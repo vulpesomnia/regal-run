@@ -38,6 +38,8 @@ class Player(pygame.sprite.Sprite):
         self.checkpoint = None
         self.jumpSound = pygame.mixer.Sound("./Assets/Sounds/jump.wav")
         self.explosionSound = pygame.mixer.Sound("./Assets/Sounds/explosion.wav")
+        self.jumpSound.set_volume(0.5)
+        self.explosionSound.set_volume(0.5)
 
         self.isFlipped = False
 
