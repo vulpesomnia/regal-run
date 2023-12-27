@@ -16,6 +16,8 @@ from level import Level
 pygame.init()
 settings.initializeFont()
 
+pygame.mouse.set_visible(False)
+
 screen = pygame.display.set_mode((settings.screenWidth, settings.screenHeight), pygame.DOUBLEBUF)
 clock = pygame.time.Clock()
 renderingFrame = pygame.Surface((settings.CONST_screenWidth, settings.CONST_screenHeight))
@@ -112,11 +114,10 @@ while True:
         accumulatedTime = 0
         
 
-                
-
-
     pygame.display.flip()
     level.render(renderingFrame)
+
+
     lastTime = currentTime
     clock.tick(RenderingFps)
 

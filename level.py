@@ -24,6 +24,7 @@ class Level:
         self.blackFade = pygame.Surface((settings.screenWidth, settings.screenHeight), pygame.SRCALPHA)
         self.blackFade.fill((0, 0, 0))
         self.blackFade.set_alpha(255)
+
         settings.currentLevel = self
 
         self.alphaIncrement = 0
