@@ -257,10 +257,6 @@ class Level:
         
         if settings.gamemode == 1:#Draw editor if in editor mode
             self.editor.draw(frame)
-
-
-        #change to function then add to tick
-        
             
         frame.blit(self.blackFade, (0, 0))
 

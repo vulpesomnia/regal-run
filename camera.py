@@ -22,7 +22,6 @@ class Camera:
         if (player.isDead == 0):
             newX = self.x * 0.75 + ((player.rect.x - settings.CONST_screenWidth / 2)) * 0.25
         
-            #TODO: make sure this value is good! (the constant at the end of the equation, used for offsetting camera. lots of unused y-axis space)
             newY = self.y * 0.75 + ((player.rect.y - settings.CONST_screenHeight / 2)) * 0.25 + self.yOffset
 
 

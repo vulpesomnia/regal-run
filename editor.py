@@ -45,7 +45,6 @@ class Editor:
         for index, button in enumerate(self.buttons):
             if (x > button.x) and (x < button.x+button.width):
                 if (y > button.y) and (y < button.y+button.height):
-                    #print("Clicked a button! Index: " + str(index) + " ID: " + str(button.id))
                     if button.id == 1:
                         self.selectedImage = index
                     elif button.id == 2:

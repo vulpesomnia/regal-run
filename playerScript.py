@@ -83,7 +83,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         if self.isDead == 0:
             self.getInput()
-            self.velocity.y -= self.gravity#Gravity of player
+            self.velocity.y -= self.gravity
             if settings.gamemode == 1:
                 self.jumpFrames = self.jumpFrameMax
             else:
@@ -96,8 +96,8 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image, True, False)
 
     def render(self, frame, camera):
-        camOffsetX = (self.rect.x) - camera.x - self.image.get_width() / 2 + 25 # + (self.velocity.x * self.speed * frameTime)
-        camOffsetY = (self.rect.y) - camera.y - self.image.get_height() / 2 + 12 # - (self.velocity.y * frameTime)
+        camOffsetX = (self.rect.x) - camera.x - self.image.get_width() / 2 + 25
+        camOffsetY = (self.rect.y) - camera.y - self.image.get_height() / 2 + 12
         frame.blit(self.image, (camOffsetX-settings.pWidth/4, camOffsetY))
         
 

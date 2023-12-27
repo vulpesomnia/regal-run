@@ -45,9 +45,7 @@ levels = []
 # Appends to the array above all level files.
 for obj in os.scandir("Assets/Levels"):
     if obj.is_file():
-        #levels.insert(0, obj.name)
         levels.append(obj.name)
-print("LEVELS: " + str(levels))
 
 def setGamemode(int):
     global gamemode
@@ -59,14 +57,12 @@ def initializeFont():
 
 def dictLength(dict):
     length = 0
-    for key, values in dict.items():
+    for values in dict.values():
         length += len(values)
     return length
 
-#def getDistance(pointA, pointB):
-#    return math.sqrt((pointA[0] - pointB[0])^2 + (pointA[1] - pointB[1])^2)
-
 # - These are for tilesets not floating point world coordinates. - #
+
 def worldToScreenSpace(x, y):
     x = screenWidth - x * tileSize
     y = screenHeight - y * tileSize
